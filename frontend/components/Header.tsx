@@ -1,36 +1,28 @@
 // frontend/components/Header.tsx
+import Link from "next/link";
 export default function Header() {
   return (
-    <nav className="bg-red-600">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <a href="/" className="text-xl font-bold text-white">The Local Kitchen</a>
+    <nav className="bg-red-600 w-full z-10 relative"> 
+      <div className="grid grid-cols-3 h-16 items-center">
+        {/* Logo */}
+        <div className="flex items-center space-x-2 pl-4">
+          <img src="/logo.jpg" alt="Logo" className="h-12 w-12" />
+          <Link href="/" className="text-xl font-bold text-white">The Local Kitchen</Link>
+        </div>
 
-          {/* Navigation Links */}
-          <div className="flex space-x-4">
-            <a href="/" className="text-white hover:text-gray-200">Home</a>
-            <a href="/about" className="text-white hover:text-gray-200">About</a>
-            <a href="/blog" className="text-white hover:text-gray-200">Blog</a>
-            <a href="/restaurants" className="text-white hover:text-gray-200">Restaurants</a>
-            <a href="/contact" className="text-white hover:text-gray-200">Contact</a>
-          </div>
+        {/* Navigation Links */}
+        <div className="flex items-center justify-center gap-8 font-medium">
+          <Link href="/" className="text-white hover:text-gray-200 transition">Home</Link>
+          <Link href="/about" className="text-white hover:text-gray-200 transition">About</Link>
+          <Link href="/blog" className="text-white hover:text-gray-200 transition">Blog</Link>
+          <Link href="/restaurants" className="text-white hover:text-gray-200 transition">Restaurants</Link>
+          <Link href="/contact" className="text-white hover:text-gray-200 transition">Contact</Link>
+        </div>
 
-          {/* Login Button */}
-          <div className="flex space-x-4">
-            <a href="/login" className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">Login</a>
-          </div>
-
-          {/* Shopping Cart Icon */}
-          <div className="flex items-center">
-            <a href="/cart" className="text-white hover:text-gray-200">
-              <img
-                src="/cart.svg"
-                alt="Shopping cart"
-                className="h-6 w-6"
-              />
-            </a>
-          </div>
+        {/* Login + Cart */}
+        <div className="flex items-center justify-end gap-4">
+          <Link href="/auth/login" className="bg-orange-500 text-white px-6 py-3 text-lg rounded hover:bg-orange-600 transition">Login</Link>
+          <Link href="/cart" className="text-white"><img src="/cart.svg" alt="Cart" className="h-7 w-7" /></Link>
         </div>
       </div>
     </nav>
