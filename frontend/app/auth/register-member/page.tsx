@@ -16,6 +16,24 @@ export default function Register() {
           {/* Form */}
           <div className="flex flex-col w-full max-w-sm" style={{ gap: "28px" }}>
             <div className="flex flex-col" style={{ gap: "8px" }}>
+              <label className="text-sm font-semibold text-gray-500">First Name</label>
+              <input
+                type="text"
+                className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                style={{ padding: "18px 20px", fontSize: "16px" }}
+              />
+            </div>
+
+            <div className="flex flex-col" style={{ gap: "8px" }}>
+              <label className="text-sm font-semibold text-gray-500">Last Name</label>
+              <input
+                type="text"
+                className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                style={{ padding: "18px 20px", fontSize: "16px" }}
+              />
+            </div>
+
+            <div className="flex flex-col" style={{ gap: "8px" }}>
               <label className="text-sm font-semibold text-gray-500">Email</label>
               <input
                 type="email"
@@ -23,6 +41,7 @@ export default function Register() {
                 style={{ padding: "18px 20px", fontSize: "16px" }}
               />
             </div>
+
             <div className="flex flex-col" style={{ gap: "8px" }}>
               <label className="text-sm font-semibold text-gray-500">Password</label>
               <input
@@ -31,6 +50,7 @@ export default function Register() {
                 style={{ padding: "18px 20px", fontSize: "16x" }}
               />
             </div>
+
             <div className="flex flex-col" style={{ gap: "8px" }}>
               <label className="text-sm font-semibold text-gray-500">Confirm Password</label>
               <input
@@ -39,6 +59,7 @@ export default function Register() {
                 style={{ padding: "18px 20px", fontSize: "16px" }}
               />
             </div>
+
             <button
               type="submit"
               className="bg-orange-500 text-white font-bold rounded-full hover:bg-orange-600 transition cursor-pointer"
@@ -53,8 +74,7 @@ export default function Register() {
         <div className="w-2/5 bg-blue-600 text-white rounded-tr-2xl rounded-br-2xl flex flex-col justify-center items-center text-center" style={{ padding: "72px 56px" }}>
           <h2 className="text-4xl font-bold mb-4">Welcome!</h2>
           <div style={{ marginBottom: "28px" }}></div>
-          <p className="text-green-50 leading-relaxed" style={{ marginBottom: "48px", fontSize: "16px" }}>
-            Already have an account?{" "}
+          <p className="text-green-50 leading-relaxed" style={{ marginBottom: "48px", fontSize: "16px" }}>Already have an account?&nbsp;
             <Link href="/auth/login" className="text-white hover:underline">Sign In</Link>
           </p>
         </div>
