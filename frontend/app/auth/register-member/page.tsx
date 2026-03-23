@@ -1,84 +1,244 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const phoneRegex = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
+
 export default function Register() {
+  const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const phoneValid = phoneRegex.test(formData.phoneNumber);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: 
+        name === "phoneNumber" 
+        ? value.replace(/[^+\d\s-]/g, "") 
+        : value,
+    }));
+
+    if (name === "phoneNumber") setPhoneTouched(true);
+  }
+
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (formData.phoneNumber && !phoneValid) {
+      setError("Please enter a valid phone number.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/accounts/register/member/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: formData.firstName || undefined,
+            last_name: formData.lastName || undefined,
+            email: formData.email,
+            phone_number: formData.phoneNumber || undefined,
+            password: formData.password,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(
+          data.detail ||
+          data.email?.[0] ||
+          data.phone_number?.[0] ||
+          "Registration failed. Please try again."
+        );
+        return;
+      }
+
+      router.push("/auth/login");
+    } catch {
+      setError("Unable to connect to the server. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+  
   return (
     <main className="flex items-center justify-center min-h-screen px-6">
       <div className="rounded-2xl shadow-2xl flex w-full max-w-4xl">
-        
+
         {/* Sign up Section */}
         <div className="w-3/5 flex flex-col justify-center" style={{ padding: "80px 72px" }}>
           <div className="font-bold mb-4">
-            <Link href="/" className="text-xl font-bold text-black-500 text-sm hover:underline">The Local Kitchen</Link>
+            <Link href="/" className="text-xl font-bold hover:underline">The Local Kitchen</Link>
           </div>
-          <h2 className="text-4xl font-bold text-black-500 mb-4">Create an Account</h2>
-          <div style={{ marginBottom: "48px" }}></div>
-          
-          {/* Form */}
-          <div className="flex flex-col w-full max-w-sm" style={{ gap: "28px" }}>
-            <div className="flex flex-col" style={{ gap: "8px" }}>
-              <label className="text-sm font-semibold text-gray-500">First Name</label>
-              <input
-                type="text"
-                className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                style={{ padding: "18px 20px", fontSize: "16px" }}
-              />
-            </div>
 
-            <div className="flex flex-col" style={{ gap: "8px" }}>
-              <label className="text-sm font-semibold text-gray-500">Last Name</label>
-              <input
-                type="text"
-                className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                style={{ padding: "18px 20px", fontSize: "16px" }}
-              />
-            </div>
+          <h2 className="text-4xl font-bold mb-6">Create a Member Account</h2>
 
-            <div className="flex flex-col" style={{ gap: "8px" }}>
-              <label className="text-sm font-semibold text-gray-500">Email</label>
-              <input
-                type="email"
-                className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                style={{ padding: "18px 20px", fontSize: "16px" }}
-              />
+          {error && (
+            <div className="mt-2 mb-4 px-5 py-4 rounded-xl bg-red-100 text-red-600 text-lg font-semibold border border-red-300 flex items-center" style={{ marginTop: "24px" }}>
+              {error}
             </div>
+          )}
 
-            <div className="flex flex-col" style={{ gap: "8px" }}>
-              <label className="text-sm font-semibold text-gray-500">Password</label>
-              <input
-                type="password"
-                className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                style={{ padding: "18px 20px", fontSize: "16x" }}
-              />
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: "24px" }}></div>
+
+            {/* First & Last Name */}
+            <div className="flex flex-col" style={{ gap: "20px" }}>
+              <div className="flex" style={{ gap: "16px" }}>
+                <div className="flex flex-col w-1/2" style={{ gap: "8px" }}>
+                  <label className="text-sm font-semibold text-gray-500">First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                    style={{ padding: "18px 20px", fontSize: "16px" }}
+                  />
+                </div>
+
+                <div className="flex flex-col w-1/2" style={{ gap: "8px" }}>
+                  <label className="text-sm font-semibold text-gray-500">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                    style={{ padding: "18px 20px", fontSize: "16px" }}
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="flex flex-col" style={{ gap: "8px" }}>
+                <label className="text-sm font-semibold text-gray-500">Email</label>
+                <input
+                  required
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  style={{ padding: "18px 20px", fontSize: "16px" }}
+                />
+              </div>
+
+              {/* Phone Number */}
+              <div className="flex flex-col" style={{ gap: "8px" }}>
+                <label className="text-sm font-semibold text-gray-500">Phone Number</label>
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  maxLength={16}
+                  title="Phone number format: +1 123-456-7890"
+                  onChange={handleChange}
+                  className={`rounded-xl focus:outline-none transition duration-300 ease
+                    ${phoneTouched && formData.phoneNumber.length > 0
+                      ? phoneValid
+                        ? "bg-transparent text-green-500 border border-green-200 focus:border-green-500 hover:border-green-300 focus:shadow shadow-sm"
+                        : "bg-transparent text-red-500 border border-red-200 focus:border-red-500 hover:border-red-300 focus:shadow shadow-sm"
+                      : "bg-gray-100 text-gray-700 focus:ring-2 focus:ring-blue-500"
+                    }`}
+                  style={{ padding: "18px 20px", fontSize: "16px" }}
+                />
+
+                {phoneTouched && formData.phoneNumber.length > 0 && phoneValid && (
+                  <p className="flex items-center mt-1 text-xs text-green-400">Great! Your phone number is valid.</p>
+                )}
+
+                {phoneTouched && formData.phoneNumber.length > 0 && !phoneValid && (
+                  <p className="flex items-center mt-1 text-xs text-red-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 mr-2 shrink-0">
+                      <path fillRule="evenodd"
+                        d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                        clipRule="evenodd" />
+                    </svg>
+                    Please match the requested format. e.g., +1 123-456-7890
+                  </p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="flex flex-col" style={{ gap: "8px" }}>
+                <label className="text-sm font-semibold text-gray-500">Password</label>
+                <input
+                  required
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  style={{ padding: "18px 20px", fontSize: "16px" }}
+                />
+              </div>
+
+              {/* Confirm Password */}
+              <div className="flex flex-col" style={{ gap: "8px" }}>
+                <label className="text-sm font-semibold text-gray-500">Confirm Password</label>
+                <input
+                  required
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  style={{ padding: "18px 20px", fontSize: "16px" }}
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className="bg-orange-500 text-white font-bold rounded-full hover:bg-orange-600 transition cursor-pointer"
+                style={{ padding: "20px", fontSize: "16px", marginTop: "8px" }}
+              >
+                {loading ? "Creating Account..." : "Create Account"}
+              </button>
             </div>
+            </form>
+          </div>
 
-            <div className="flex flex-col" style={{ gap: "8px" }}>
-              <label className="text-sm font-semibold text-gray-500">Confirm Password</label>
-              <input
-                type="password"
-                className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                style={{ padding: "18px 20px", fontSize: "16px" }}
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="bg-orange-500 text-white font-bold rounded-full hover:bg-orange-600 transition cursor-pointer"
-              style={{ padding: "20px", fontSize: "16px", marginTop: "8px" }}
-            >
-              Create Account
-            </button>
+          {/* Sign in Section */}
+          <div className="w-2/5 bg-blue-600 text-white rounded-tr-2xl rounded-br-2xl flex flex-col justify-center items-center text-center" style={{ padding: "72px 56px" }}>
+            <h2 className="text-4xl font-bold mb-4">Welcome!</h2>
+            <div style={{ marginBottom: "28px" }}></div>
+            <p className="text-green-50 leading-relaxed" style={{ marginBottom: "48px", fontSize: "16px" }}>
+              Already have an account?&nbsp;
+              <Link href="/auth/login" className="text-white hover:underline">Sign In</Link>
+            </p>
           </div>
         </div>
-
-        {/* Sign in Section */}
-        <div className="w-2/5 bg-blue-600 text-white rounded-tr-2xl rounded-br-2xl flex flex-col justify-center items-center text-center" style={{ padding: "72px 56px" }}>
-          <h2 className="text-4xl font-bold mb-4">Welcome!</h2>
-          <div style={{ marginBottom: "28px" }}></div>
-          <p className="text-green-50 leading-relaxed" style={{ marginBottom: "48px", fontSize: "16px" }}>Already have an account?&nbsp;
-            <Link href="/auth/login" className="text-white hover:underline">Sign In</Link>
-          </p>
-        </div>
-      </div>
     </main>
   );
 }

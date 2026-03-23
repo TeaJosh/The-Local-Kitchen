@@ -25,13 +25,16 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const body = new FormData();
-      body.append("email", formData.email);
-      body.append("password", formData.password);
-
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/accounts/login/`,
-        { method: "POST", body }
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
       );
 
       const data = await res.json();
