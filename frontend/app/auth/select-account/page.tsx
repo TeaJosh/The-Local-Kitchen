@@ -8,7 +8,7 @@ export default function SelectAccount() {
   return (
     <main className="flex items-center justify-center min-h-screen">
       <div className="bg-white rounded-xl shadow-lg p-10 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-8" style={{ marginBottom: "12px" }}>Choose Account Type</h2>
+        <h2 className="text-2xl font-bold text-center mb-6" style={{ marginBottom: "12px" }}>Choose Account Type</h2>
 
         {/* Member */}
         <div
