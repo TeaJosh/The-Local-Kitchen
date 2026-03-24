@@ -54,24 +54,20 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const body = new FormData();
-      body.append("email", formData.email);
-      body.append("phone_number", formData.phoneNumber);
-      body.append("password", formData.password);
-
-      if (formData.firstName) {
-        body.append("first_name", formData.firstName)
-      }
-
-      if (formData.lastName) {
-        body.append("last_name", formData.lastName)
-      }
-
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/accounts/register/member/`,
         {
           method: "POST",
-          body,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: formData.firstName || undefined,
+            last_name: formData.lastName || undefined,
+            email: formData.email,
+            phone_number: formData.phoneNumber || undefined,
+            password: formData.password,
+          }),
         }
       );
 
@@ -105,7 +101,7 @@ export default function Register() {
             <Link href="/" className="text-xl font-bold hover:underline">The Local Kitchen</Link>
           </div>
 
-          <h2 className="text-4xl font-bold mb-6">Create an Account</h2>
+          <h2 className="text-4xl font-bold mb-6">Create a Member Account</h2>
 
           {error && (
             <div className="mt-2 mb-4 px-5 py-4 rounded-xl bg-red-100 text-red-600 text-lg font-semibold border border-red-300 flex items-center" style={{ marginTop: "24px" }}>
@@ -173,7 +169,7 @@ export default function Register() {
                       ? phoneValid
                         ? "bg-transparent text-green-500 border border-green-200 focus:border-green-500 hover:border-green-300 focus:shadow shadow-sm"
                         : "bg-transparent text-red-500 border border-red-200 focus:border-red-500 hover:border-red-300 focus:shadow shadow-sm"
-                      : "bg-gray-100 text-gray-700 focus:ring-2 focus:ring-blue-500"  // ← matches other fields
+                      : "bg-gray-100 text-gray-700 focus:ring-2 focus:ring-blue-500"
                     }`}
                   style={{ padding: "18px 20px", fontSize: "16px" }}
                 />

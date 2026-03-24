@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ConditionalHeader from "@/components/ConditionalHeader";
-import Footer from "@/components/Footer";
+import ConditionalFooter from "@/components/ConditionalFooter";
 
 export const metadata: Metadata = {
   title: "The Local Kitchen",
@@ -16,10 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="flex flex-col min-h-screen">
         <ConditionalHeader />
-        <main>{children}</main>
-        <Footer />
+        <main className="flex-grow">{children}</main>
+        <ConditionalFooter />
       </body>
     </html>
   );
