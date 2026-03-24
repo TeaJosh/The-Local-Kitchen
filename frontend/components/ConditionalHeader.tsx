@@ -1,0 +1,11 @@
+"use client";
+import { usePathname } from "next/navigation";
+import Header from "./Header";
+
+export default function ConditionalHeader() {
+  const pathname = usePathname();
+  const hideOn = ["/auth/login", "/auth/select-account", "/auth/register-member", "/auth/register-restaurant"];
+
+  if (hideOn.includes(pathname)) return null;
+  return <Header />;
+}
