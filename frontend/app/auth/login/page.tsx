@@ -7,7 +7,7 @@ export default function Login() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
 
@@ -24,6 +24,8 @@ export default function Login() {
     setError("");
     setLoading(true);
 
+    const isEmail = formData.identifier.includes("@");
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/accounts/login/`,
@@ -31,7 +33,9 @@ export default function Login() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            email: formData.email,
+            ...(isEmail
+              ? { email: formData.identifier }
+              : { username: formData.identifier }),
             password: formData.password,
           }),
         }
@@ -43,6 +47,7 @@ export default function Login() {
         setError(
           data.detail ||
           data.email?.[0] ||
+          data.username?.[0] ||
           "Login failed. Please try again."
         );
         return;
@@ -59,7 +64,7 @@ export default function Login() {
   return (
     <main className="flex items-center justify-center min-h-screen px-6">
       <div className="rounded-2xl shadow-2xl flex w-full max-w-4xl">
-        
+
         {/* Sign in Section */}
         <div className="w-3/5 flex flex-col justify-center" style={{ padding: "80px 72px" }}>
           <div className="font-bold mb-4">
@@ -76,15 +81,15 @@ export default function Login() {
 
           <form onSubmit={handleSubmit}>
 
-            {/* Email */}
+            {/* Username or Email */}
             <div className="flex flex-col w-full max-w-sm" style={{ gap: "28px" }}>
               <div className="flex flex-col" style={{ gap: "8px" }}>
-                <label className="text-sm font-semibold text-gray-500">Email</label>
+                <label className="text-sm font-semibold text-gray-500">Username or Email</label>
                 <input
                   required
-                  type="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="identifier"
+                  value={formData.identifier}
                   onChange={handleChange}
                   className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 transition-all"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
