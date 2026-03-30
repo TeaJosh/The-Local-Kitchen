@@ -13,16 +13,16 @@ export default function Header() {
 
         {/* Navigation Links */}
         <div className="flex items-center justify-center gap-8 font-medium">
-          <Link href="/" className="text-white text-lg hover:text-gray-200 transition">Home</Link>
-          <Link href="/about" className="text-white text-lg hover:text-gray-200 transition">About</Link>
-          <Link href="/blog" className="text-white text-lg hover:text-gray-200 transition">Blog</Link>
-          <Link href="/restaurants" className="text-white text-lg hover:text-gray-200 transition">Restaurants</Link>
-          <Link href="/contact" className="text-white text-lg hover:text-gray-200 transition">Contact</Link>
+          <Link href="/" className="text-white text-base hover:text-gray-200 transition">Home</Link>
+          <Link href="/about" className="text-white text-base hover:text-gray-200 transition">About</Link>
+          <Link href="/blog" className="text-white text-base hover:text-gray-200 transition">Blog</Link>
+          <Link href="/restaurants" className="text-white text-base hover:text-gray-200 transition">Restaurants</Link>
+          <Link href="/contact" className="text-white text-base hover:text-gray-200 transition">Contact</Link>
         </div>
 
         {/* Login + Cart */}
         <div className="flex items-center justify-end gap-4" style={{ paddingRight: "32px" }}>
-          <Link href="/auth/login" className="bg-orange-500 text-white py-2 px-4 text-lg rounded hover:bg-orange-600 transition" style={{ padding: "4px 12px" }}>Login</Link>
+          <Link href="/auth/login" className="bg-orange-500 text-white py-2 px-4 text-base rounded hover:bg-orange-600 transition" style={{ padding: "4px 12px" }}>Login</Link>
           <Link href="/not-found.tsx"><Image src="/icons/cart.svg" width={48} height={48}  alt="Cart" className="h-7 w-7" /></Link>
         </div>
       </div>
