@@ -12,6 +12,7 @@ export default function Register() {
     firstName: "",
     lastName: "",
     email: "",
+    username: "",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
@@ -28,10 +29,10 @@ export default function Register() {
 
     setFormData((prev) => ({
       ...prev,
-      [name]: 
-        name === "phoneNumber" 
-        ? value.replace(/[^+\d\s-]/g, "") 
-        : value,
+      [name]:
+        name === "phoneNumber"
+          ? value.replace(/[^+\d\s-]/g, "")
+          : value,
     }));
 
     if (name === "phoneNumber") setPhoneTouched(true);
@@ -65,6 +66,7 @@ export default function Register() {
             first_name: formData.firstName || undefined,
             last_name: formData.lastName || undefined,
             email: formData.email,
+            username: formData.username,
             phone_number: formData.phoneNumber || undefined,
             password: formData.password,
           }),
@@ -77,6 +79,7 @@ export default function Register() {
         setError(
           data.detail ||
           data.email?.[0] ||
+          data.username?.[0] ||
           data.phone_number?.[0] ||
           "Registration failed. Please try again."
         );
@@ -90,7 +93,7 @@ export default function Register() {
       setLoading(false);
     }
   }
-  
+
   return (
     <main className="flex items-center justify-center min-h-screen px-6">
       <div className="rounded-2xl shadow-2xl flex w-full max-w-4xl">
@@ -147,7 +150,24 @@ export default function Register() {
                   required
                   type="email"
                   name="email"
+                  maxLength={254}
                   value={formData.email}
+                  onChange={handleChange}
+                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  style={{ padding: "18px 20px", fontSize: "16px" }}
+                />
+              </div>
+
+              {/* Username */}
+              <div className="flex flex-col" style={{ gap: "8px" }}>
+                <label className="text-sm font-semibold text-gray-500">Username</label>
+                <input
+                  required
+                  type="text"
+                  name="username"
+                  minLength={6}
+                  maxLength={30}
+                  value={formData.username}
                   onChange={handleChange}
                   className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
@@ -197,6 +217,8 @@ export default function Register() {
                   required
                   type="password"
                   name="password"
+                  minLength={14}
+                  maxLength={16}
                   value={formData.password}
                   onChange={handleChange}
                   className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
@@ -211,13 +233,15 @@ export default function Register() {
                   required
                   type="password"
                   name="confirmPassword"
+                  minLength={8}
+                  maxLength={64}
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
                 />
               </div>
-              
+
               <button
                 type="submit"
                 className="bg-orange-500 text-white font-bold rounded-full hover:bg-orange-600 transition cursor-pointer"
@@ -226,19 +250,19 @@ export default function Register() {
                 {loading ? "Creating Account..." : "Create Account"}
               </button>
             </div>
-            </form>
-          </div>
-
-          {/* Sign in Section */}
-          <div className="w-2/5 bg-blue-600 text-white rounded-tr-2xl rounded-br-2xl flex flex-col justify-center items-center text-center" style={{ padding: "72px 56px" }}>
-            <h2 className="text-4xl font-bold mb-4">Welcome!</h2>
-            <div style={{ marginBottom: "28px" }}></div>
-            <p className="text-green-50 leading-relaxed" style={{ marginBottom: "48px", fontSize: "16px" }}>
-              Already have an account?&nbsp;
-              <Link href="/auth/login" className="text-white hover:underline">Sign In</Link>
-            </p>
-          </div>
+          </form>
         </div>
+
+        {/* Sign in Section */}
+        <div className="w-2/5 bg-blue-600 text-white rounded-tr-2xl rounded-br-2xl flex flex-col justify-center items-center text-center" style={{ padding: "72px 56px" }}>
+          <h2 className="text-4xl font-bold mb-4">Welcome!</h2>
+          <div style={{ marginBottom: "28px" }}></div>
+          <p className="text-green-50 leading-relaxed" style={{ marginBottom: "48px", fontSize: "16px" }}>
+            Already have an account?&nbsp;
+            <Link href="/auth/login" className="text-white hover:underline">Sign In</Link>
+          </p>
+        </div>
+      </div>
     </main>
   );
 }
