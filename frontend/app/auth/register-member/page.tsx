@@ -217,8 +217,8 @@ export default function Register() {
                   required
                   type="password"
                   name="password"
-                  minLength={14}
-                  maxLength={16}
+                  minLength={8}
+                  maxLength={64}
                   value={formData.password}
                   onChange={handleChange}
                   className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
