@@ -1,5 +1,6 @@
-/* frontend/app/globals.css */
 @import "tailwindcss";
+@import '../styles/_variables.scss';
+@import '../styles/_keyframe-animations.scss';
 
 * {
   margin: 0;

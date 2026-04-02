@@ -53,6 +53,12 @@ export default function Login() {
         return;
       }
 
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify({
+        username: data.username,
+        profilePicture: data.pfp,
+      }));
+
       router.push("/");
     } catch {
       setError("Unable to connect to the server. Please try again.");
@@ -71,10 +77,10 @@ export default function Login() {
             <Link href="/" className="text-xl font-bold text-black-500 text-sm hover:underline">The Local Kitchen</Link>
           </div>
           <h2 className="text-4xl font-bold text-black-500 mb-4">Sign in to your account</h2>
-          <div style={{ marginBottom: "48px" }}></div>
+          <div style={{ marginBottom: "24px" }}></div>
 
           {error && (
-            <div className="mb-6 px-5 py-4 rounded-xl bg-red-100 text-red-600 text-lg font-semibold border border-red-300 flex items-center">
+            <div className="mb-6 px-5 py-4 rounded-xl bg-red-100 text-red-600 text-lg font-semibold border border-red-300 flex items-center" style={{ marginBottom: "24px" }}>
               {error}
             </div>
           )}

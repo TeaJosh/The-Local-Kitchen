@@ -10,7 +10,7 @@ export default function NotFound() {
           <p className="mb-4 text-lg text-slate-800" style={{ margin: "8px" }}>Sorry, the page you are looking for does not exist.</p>
           <Link href="/" className="px-10 py-4 text-xl bg-blue-500 text-white rounded-md hover:bg-blue-600" style={{ padding: "8px" }}>Back to Homepage</Link>
         </div>
-        </div>
-      </main>
+      </div>
+    </main>
   );
 }
