@@ -109,24 +109,24 @@ export default function Header() {
                         </div>
                       )}
                     </div>
-                  <div>
-                    <h6 className="text-gray-800 text-base font-semibold">{user.username}</h6>
-                    <small className="text-gray-400">Member</small>
-                  </div>
+                    <div>
+                      <h6 className="text-gray-800 text-base font-semibold">{user.username}</h6>
+                      <small className="text-gray-400">Member</small>
+                    </div>
                   </li>
 
                   <li>
-                    <Link href="/account" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link href="/account/settings/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
                       My Profile
                     </Link>
                   </li>
                   <li>
-                    <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link href="/account/settings/account" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
                       Account Settings
                     </Link>
                   </li>
                   <li>
-                    <Link href="/notifications" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link href="/account/settings/notifications" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
                       Notifications
                     </Link>
                   </li>
@@ -141,9 +141,14 @@ export default function Header() {
                       My Posts
                     </Link>
                   </li>
+                  <li>
+                    <Link href="/blog/saved-posts" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                      Saved Posts
+                    </Link>
+                  </li>
                   <li className="flex items-center gap-3 px-4 py-3 border-b border-gray-200"></li>
                   <li>
-                    <Link href="/order-history" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link href="/account/settings/order-history" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
                       Order History
                     </Link>
                   </li>
@@ -154,14 +159,12 @@ export default function Header() {
                   </li>
 
                   {/* Sign out */}
-                  <li className="px-4 py-3 border-t border-gray-200">
-                    <button
-                      onClick={handleLogout}
-                      className="flex w-full items-center justify-center gap-2 bg-red-100 text-red-500 font-semibold text-sm py-2 rounded-lg hover:bg-red-200 transition"
-                    >
-                      Sign Out
-                    </button>
-                  </li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                  >
+                    Sign Out
+                  </button>
                 </ul>
               )}
             </div>

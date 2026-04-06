@@ -92,6 +92,7 @@ def login_view(request):
         return JsonResponse({
             'message': 'Login successful',
             'username': user.username,
+            'email': user.email,
             'profile_picture': request.build_absolute_uri(user.profile_picture.url) if user.profile_picture else None,
         })
 

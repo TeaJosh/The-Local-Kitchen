@@ -56,6 +56,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify({
         username: data.username,
+        email: data.email,
         profilePicture: data.pfp,
       }));
 
