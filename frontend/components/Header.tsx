@@ -42,10 +42,16 @@ export default function Header() {
       <div className="grid grid-cols-3 h-16 items-center">
 
         {/* Logo */}
-        <div className="flex items-center space-x-2" style={{ paddingLeft: "32px" }}>
-          <Image src="/icons/logo.svg" width={48} height={48} alt="Logo" className="h-12 w-12" />
-          <Link href="/" className="text-xl font-bold text-white" style={{ paddingLeft: "12px" }}>
-            The Local Kitchen
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/icons/TLK_logo.svg"
+              width={110}
+              height={110}
+              alt="The Local Kitchen Logo"
+              className="h-13 w-40 object-contain"
+              priority
+            />
           </Link>
         </div>
 
@@ -153,7 +159,7 @@ export default function Header() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="/help-center" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link href="/support/help-center" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
                       Help Center
                     </Link>
                   </li>
