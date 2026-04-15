@@ -81,7 +81,7 @@ export default function CreatePost() {
         c.toLowerCase().includes(cuisineSearch.toLowerCase())
     );
 
-    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!title.trim() || !editor) {
             alert("Please fill in title and content");
@@ -89,22 +89,25 @@ export default function CreatePost() {
         }
         setSaving(true);
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts/`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts/create/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
                 body: JSON.stringify({
                     title,
-                    heading,
-                    imgSrc,
+                    subheading: heading,
+                    image: imgSrc,
+                    section: selectedCategory,
+                    cuisine: selectedCuisine,
+                    occasion: selectedOccasion,
                     city,
                     state,
                     content: editor.getHTML(),
-                    commentsEnabled: comments === "1",
-                    isAnonymous: privacy === "1",
-                    isDraft,
+                    allow_comments: comments === "1",
+                    is_anonymous: privacy === "1",
+                    is_draft: isDraft,
                     tags: {
                         category: selectedCategory,
                         cuisine: selectedCuisine,
