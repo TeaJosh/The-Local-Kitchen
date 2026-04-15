@@ -72,7 +72,7 @@ export default function Header() {
             About
           </Link>
           <Link
-            href="/blog"
+            href="/posts"
             className="text-white text-base hover:text-gray-200 transition"
           >
             Blog
@@ -182,7 +182,7 @@ export default function Header() {
                   <li className="flex items-center gap-3 px-4 py-3 border-b border-gray-200"></li>
                   <li>
                     <Link
-                      href="/blog/create-post"
+                      href="/posts/create-post"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -191,7 +191,7 @@ export default function Header() {
                   </li>
                   <li>
                     <Link
-                      href="/blog/my-posts"
+                      href="/posts/my-posts"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -200,7 +200,7 @@ export default function Header() {
                   </li>
                   <li>
                     <Link
-                      href="/blog/saved-posts"
+                      href="/posts/saved-posts"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                       onClick={() => setDropdownOpen(false)}
                     >

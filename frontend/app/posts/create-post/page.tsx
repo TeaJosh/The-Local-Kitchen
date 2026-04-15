@@ -128,9 +128,9 @@ const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     return (
         <div className="min-h-screen flex items-center justify-center px-4 py-16">
 
-            {/* Back to Blog */}
+            {/* Back to Posts */}
             <Link
-                href="/blog"
+                href="/posts"
                 className="absolute top-6 left-6 inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 transition"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
