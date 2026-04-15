@@ -6,7 +6,8 @@ async function getPosts() {
     if (!baseUrl) return [];
     const res = await fetch(`${baseUrl}/api/posts/`, { cache: "no-store" });
     if (!res.ok) return [];
-    return res.json();
+    const data = await res.json();
+    return data.posts;
 }
 
 export default async function Blog() {
@@ -21,12 +22,12 @@ export default async function Blog() {
                 {posts.length === 0 && (
                     <p className="text-gray-500">No posts yet.</p>
                 )}
-                {posts.map((post: { id: string; imgSrc: string; title: string; subheading: string; city: string; state: string; created_at: string }) => (
+                {posts.map((post: { id: string; image: string; title: string; subheading: string; city: string; state: string; created_at: string }) => (
                     <Link key={post.id} href={`/posts/${post.id}`}>
                         <div className="border rounded-lg p-6 hover:bg-slate-50">
-                            {post.imgSrc && (
+                            {post.image && (
                                 <Image
-                                    src={post.imgSrc}
+                                    src={post.image}
                                     width={500}
                                     height={500}
                                     alt="Blog card image"
