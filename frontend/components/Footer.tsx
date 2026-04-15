@@ -39,7 +39,7 @@ export default function Footer() {
               <li><Link href="/support/help-center" className="hover:text-white transition">Help Center</Link></li>
               <li><Link href="/support/faqs" className="hover:text-white transition">FAQs</Link></li>
               <li><Link href="/support/community-guideline" className="hover:text-white transition">Community Guideline</Link></li>
-              <li><Link href="/support/report-content" className="hover:text-white transition">Report Content</Link></li>
+              <li><Link href="/support/report-user" className="hover:text-white transition">Report User</Link></li>
             </ul>
           </div>
           

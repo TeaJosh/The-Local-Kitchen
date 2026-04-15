@@ -47,11 +47,7 @@ export default function Header() {
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
             <Image
-<<<<<<< HEAD
-              src="/icons/TLK_logo.svg"
-=======
               src="/icons/TLKLogo.png"
->>>>>>> ee86bcd41c1c43270d7709f1baef48058604bea0
               width={110}
               height={110}
               alt="The Local Kitchen Logo"
@@ -222,15 +218,11 @@ export default function Header() {
                     </Link>
                   </li>
                   <li>
-<<<<<<< HEAD
-                    <Link href="/support/help-center" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
-=======
                     <Link
                       href="/help-center"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                       onClick={() => setDropdownOpen(false)}
                     >
->>>>>>> ee86bcd41c1c43270d7709f1baef48058604bea0
                       Help Center
                     </Link>
                   </li>

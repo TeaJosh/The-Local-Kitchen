@@ -1,382 +1,208 @@
-"use client";
+"use client"
+import { useState } from "react";
+import { FaFacebook, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa"; 
+import { FaXTwitter } from "react-icons/fa6";
 
-import React, { useState } from "react";
+const phoneRegex = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
 
-const ContactPage: React.FC = () => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [showError, setShowError] = useState(false);
-  const [missingFields, setMissingFields] = useState<string[]>([]);
-  const [emailError, setEmailError] = useState<string | null>(null);
+/**
+ * Allows any user (logged in or anonymous) to report another user for violating community guidelines.
+ * @param props - None
+ */
+export default function Contact() {
+  const [formData, setFormData] = useState({ phoneNumber: "" });
+  const [phoneTouched, setPhoneTouched] = useState(false);
 
-  const validateEmail = (value: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(value);
-  };
+  const phoneValid = phoneRegex.test(formData.phoneNumber);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "phoneNumber"
+          ? value.replace(/[^+\d\s-]/g, "")
+          : value,
+    }));
+
+    if (name === "phoneNumber") setPhoneTouched(true);
+  }
+
+  /**
+   * Handles form submission by collecting form data and sending it to the report API.
+   * @param e - The form submission event
+   */
+  const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const missing: string[] = [];
-    let emailFormatError: string | null = null;
 
-    if (!firstName.trim()) missing.push("First Name");
-    if (!lastName.trim()) missing.push("Last Name");
-    if (!email.trim()) {
-      missing.push("Email Address");
-    } else if (!validateEmail(email.trim())) {
-      emailFormatError = "Please enter a valid email address.";
-    }
-    if (!subject.trim()) missing.push("Subject");
-    if (!message.trim()) missing.push("Message");
-
-    if (missing.length > 0 || emailFormatError) {
-      setMissingFields(missing);
-      setEmailError(emailFormatError);
-      setShowError(true);
+    // Check if user has entered a phone number and if it's valid before submitting
+    if (phoneTouched && formData.phoneNumber.length > 0 && !phoneValid) {
+      alert("Please enter a valid phone number. Format: +1 123-456-7890 or 123-456-7890");
       return;
     }
 
-    setMissingFields([]);
-    setEmailError(null);
-    setShowError(false);
-    // Submit logic here...
-  };
+    const submittedData = new FormData(e.currentTarget);
+    const user = localStorage.getItem("user");
 
-  const closeError = () => {
-    setShowError(false);
-    setEmailError(null);
+    // If user is logged in, use their username as reporter, otherwise mark as "Anonymous"
+    const reporter = user ? JSON.parse(user).username : "Anonymous";
+
+    // Collects all form data
+    const object = {
+      ...Object.fromEntries(submittedData.entries()),
+      reporter: reporter,
+    };
+
+    // Send the collected form data as JSON to the support report endpoint
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(object),
+      });
+      if (!res.ok) throw new Error("Failed to submit");
+      alert("Form submitted successfully!");
+
+      // Reset the form after successful submission
+      e.currentTarget.reset();
+
+      setFormData({ phoneNumber: "" });
+      setPhoneTouched(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit form. Please try again later.");
+    }
   };
 
   return (
-    <div id="no-tailwind-root">
-      <style>{`
-        #no-tailwind-root, 
-        #no-tailwind-root * {
-          all: unset;
-          display: revert;
-          box-sizing: border-box;
-          font: revert;
-          color: revert;
-          background: revert;
-        }
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-6xl">
+        <div className="relative">
 
-        #no-tailwind-root div, 
-        #no-tailwind-root section, 
-        #no-tailwind-root header, 
-        #no-tailwind-root main, 
-        #no-tailwind-root footer, 
-        #no-tailwind-root form, 
-        #no-tailwind-root p {
-          display: block;
-        }
-
-        #no-tailwind-root button {
-          cursor: pointer;
-        }
-      `}</style>
-
-      <div
-        style={{
-          backgroundColor: "#FFFFFF",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {/* Error Overlay */}
-        {showError && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              backgroundColor: "rgba(0,0,0,0.6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 50,
-            }}
-            onClick={closeError}
-          >
-            <div
-              style={{
-                backgroundColor: "#000000",
-                border: "1px solid #FFA500",
-                color: "#FFA500",
-                padding: "1rem 1.5rem",
-                maxWidth: "90%",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <p style={{ marginBottom: "0.5rem" }}>
-                Please complete all required fields before sending your message.
-              </p>
-
-              {missingFields.length > 0 && (
-                <ul style={{ marginBottom: "0.75rem", paddingLeft: "1.5rem" }}>
-                  {missingFields.map((field) => (
-                    <li key={field}>{field} is required.</li>
-                  ))}
-                </ul>
-              )}
-
-              {emailError && (
-                <div style={{ marginTop: "0.25rem", color: "#FFA500" }}>
-                  {emailError}
-                </div>
-              )}
-
-              <button
-                onClick={closeError}
-                style={{
-                  marginTop: "0.5rem",
-                  backgroundColor: "#FFA500",
-                  color: "#000",
-                  border: "1px solid #FFA500",
-                  padding: "0.25rem 1rem",
-                }}
-              >
-                OK
-              </button>
-            </div>
+          {/* Purple top */}
+          <div className="bg-orange-500 rounded-t-2xl h-48 px-12 py-10">
+            <h1 className="text-white text-4xl font-semibold mb-2">Get In Touch</h1>
+            <p className="text-white text-base leading-relaxed max-w-xs">
+              Feel free to contact us. Submit your queries here and we will get back to you as soon as possible.
+            </p>
           </div>
-        )}
 
-        <main
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            flexGrow: 1,
-            padding: "3rem 1rem",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
-              marginBottom: "2rem",
-              color: "#111",
-            }}
-          >
-            Contact Us
-          </h1>
 
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              backgroundColor: "#A8E6A1",
-              borderRadius: "0.5rem",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-              padding: "2rem",
-              width: "90%",
-              maxWidth: "900px",
-            }}
-          >
-            {/* Left Div */}
-            <div style={{ flex: 1, marginRight: "1rem", marginBottom: "1rem" }}>
-              <h2
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "600",
-                  marginBottom: "1rem",
-                  color: "#333",
-                }}
-              >
-                Send us a message
-              </h2>
+          {/* White bottom */}
+          <div className="bg-white rounded-b-2xl h-48" /> 
 
-              <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: "1rem" }}>
-                  <label style={{ display: "block", fontWeight: "500" }}>
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your first name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "0.5rem",
-                      border: "1px solid #000",
-                      borderRadius: "0.25rem",
-                    }}
-                  />
-                </div>
+            {/* Contact info */}
+            <div className="flex flex-col gap-4 text-base text-slate-800 mb-6">
+              <div className="flex items-center gap-3">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                </svg>
+                470-601-1911
+              </div>
+              <div className="flex items-center gap-3">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                </svg>
+                tlk@gmail.com
+              </div>
+              </div>
 
-                <div style={{ marginBottom: "1rem" }}>
-                  <label style={{ display: "block", fontWeight: "500" }}>
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your last name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "0.5rem",
-                      border: "1px solid #000",
-                      borderRadius: "0.25rem",
-                    }}
-                  />
-                </div>
+            <div className="border border-gray-100 width-50"></div>
 
-                <div style={{ marginBottom: "1rem" }}>
-                  <label style={{ display: "block", fontWeight: "500" }}>
-                    Email Address
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "0.5rem",
-                      border: "1px solid #000",
-                      borderRadius: "0.25rem",
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: "1rem" }}>
-                  <label style={{ display: "block", fontWeight: "500" }}>
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Subject of your message"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "0.5rem",
-                      border: "1px solid #000",
-                      borderRadius: "0.25rem",
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: "1rem" }}>
-                  <label style={{ display: "block", fontWeight: "500" }}>
-                    Message
-                  </label>
-                  <textarea
-                    placeholder="Type your message here"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "0.5rem",
-                      border: "1px solid #000",
-                      borderRadius: "0.25rem",
-                      height: "8rem",
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  style={{
-                    backgroundColor: "#FFA500",
-                    color: "#FFF",
-                    border: "none",
-                    borderRadius: "0.25rem",
-                    padding: "0.5rem 1.5rem",
-                  }}
-                >
-                  Send Message
-                </button>
-              </form>
+            {/* Social icons */}
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs"><FaFacebook /></div>
+              <div className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs"><FaInstagram /></div>
+              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-xs"><FaXTwitter /></div>
+              <div className="w-8 h-8 rounded-full bg-blue-800 flex items-center justify-center text-white text-xs"><FaTiktok /></div>
+              <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs"><FaYoutube /></div>
             </div>
+         
 
-            {/* Right Div */}
-            <div style={{ flex: 1 }}>
-              <h2
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "600",
-                  marginBottom: "1rem",
-                  color: "#333",
-                }}
-              >
-                Get in touch
-              </h2>
 
-              <div style={{ display: "grid", gap: "1rem" }}>
-                <div
-                  style={{
-                    backgroundColor: "#FFF",
-                    border: "1px solid #000",
-                    padding: "1rem",
-                  }}
-                >
-                  <h3 style={{ fontWeight: "600" }}>Address</h3>
-                  <p>123 Main Street, Eden Prairie, MN 55344</p>
+          {/* Floating form card */}
+          <div className="absolute top-6 right-10 w-[600px] bg-white rounded-2xl shadow-xl p-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-5">Send Us a Message</h2>
+
+            <form
+              onSubmit={onSubmit}
+              className="w-full p-8 bg-white rounded-xl shadow-sm space-y-5"
+            >
+
+              <div className="grid sm:grid-cols-2 gap-4">
+
+                {/* Full Name */}
+                <div>
+                  <label className="text-base text-slate-900 font-medium mb-2 block">Full Name</label>
+                  <input
+                    type="text"
+                    name="full_name"
+                    placeholder="Enter Full Name"
+                    className="w-full py-3 px-4 text-slate-800 bg-white border border-gray-300 focus:border-slate-900 text-base outline-0 rounded-md" />
                 </div>
 
-                <div
-                  style={{
-                    backgroundColor: "#FFF",
-                    border: "1px solid #000",
-                    padding: "1rem",
-                  }}
-                >
-                  <h3 style={{ fontWeight: "600" }}>Phone</h3>
-                  <p>000-000-0000</p>
+                {/* Email */}
+                <div>
+                  <label className="text-base text-slate-900 font-medium mb-2 block">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter Email"
+                    className="w-full py-3 px-4 text-slate-800 bg-white border border-gray-300 focus:border-slate-900 text-base outline-0 rounded-md"
+                    required
+                  />
                 </div>
 
-                <div
-                  style={{
-                    backgroundColor: "#FFF",
-                    border: "1px solid #000",
-                    padding: "1rem",
-                  }}
-                >
-                  <h3 style={{ fontWeight: "600" }}>Email</h3>
-                  <a href="mailto:thelocalkitchen@gmail.com">
-                    thelocalkitchen@gmail.com
-                  </a>
+                {/* Phone Number */}
+                <div>
+                  <label className="text-base text-slate-900 font-medium mb-2 block">Phone Number</label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    placeholder="Enter Phone Number"
+                    value={formData.phoneNumber}
+                    maxLength={16}
+                    title="Phone number format: +1 123-456-7890"
+                    onChange={handleChange}
+                    className="w-full py-3 px-4 text-slate-800 bg-white border border-gray-300 focus:border-slate-900 text-base outline-0 rounded-md"
+                  />
                 </div>
 
-                <div
-                  style={{
-                    backgroundColor: "#FFF",
-                    border: "1px solid #000",
-                    padding: "1rem",
-                  }}
-                >
-                  <h3 style={{ fontWeight: "600" }}>Website</h3>
-                  <a href="https://www.thelocalkitchen.com">
-                    www.thelocalkitchen.com
-                  </a>
+                {/* Subject */}
+                <div>
+                  <label className="text-base text-slate-900 font-medium mb-2 block">Subject</label>
+                  <input
+                    type="text"
+                    name="subject"
+                    placeholder="Enter Subject"
+                    className="w-full py-3 px-4 text-slate-800 bg-white border border-gray-300 focus:border-slate-900 text-base outline-0 rounded-md"
+                    minLength={10}
+                    maxLength={100}
+                    required
+                  />
                 </div>
 
-                <div
-                  style={{
-                    backgroundColor: "#FFA500",
-                    color: "#FFF",
-                    border: "1px solid #000",
-                    padding: "1rem",
-                  }}
-                >
-                  <h3 style={{ fontWeight: "600" }}>Support Hours</h3>
-                  <p>Monday - Friday: 9am - 5pm</p>
-                  <p>Saturday - Sunday: 10am - 4pm</p>
+                {/* Message */}
+                <div className="col-span-full">
+                  <label className="text-base text-slate-900 font-medium mb-2 block">Message</label>
+                  <textarea
+                    name="message"
+                    placeholder="Your message"
+                    minLength={40}
+                    maxLength={1000}
+                    className="w-full px-4 h-64 text-slate-800 bg-white border border-gray-300 focus:border-slate-900 text-base pt-3 outline-0 rounded-md"
+                    required
+                  />
                 </div>
               </div>
-            </div>
+
+              <button type="submit"
+                className="text-white bg-blue-500 font-medium hover:bg-blue-600 text-base px-4 py-3 w-full border-0 outline-0 rounded-md cursor-pointer mt-6">Send Message</button>
+            </form>
           </div>
-        </main>
+        </div>
       </div>
     </div>
   );
-};
-
-export default ContactPage;
+}

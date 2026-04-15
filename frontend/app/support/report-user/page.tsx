@@ -13,7 +13,6 @@ export default function ReportUser() {
   const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-
     const user = localStorage.getItem("user");
 
     // If user is logged in, use their username as reporter, otherwise mark as "Anonymous"
@@ -128,7 +127,7 @@ export default function ReportUser() {
             placeholder="Describe the issue..."
             minLength={40}
             maxLength={1000}
-            className="w-full rounded-md border px-4 py-2 h-32"
+            className="w-full rounded-md border px-4 py-2 h-48"
             required
           />
         </div>
