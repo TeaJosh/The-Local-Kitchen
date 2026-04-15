@@ -24,7 +24,6 @@ export default function ReportPage() {
 
     setMissingFields([]);
     setShowError(false);
-    // Submit logic here...
   };
 
   const closeError = () => setShowError(false);
