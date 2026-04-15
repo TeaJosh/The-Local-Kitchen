@@ -16,4 +16,3 @@ urlpatterns = [
     path('api/posts/<int:post_id>/comments/', views.add_comment, name='add_comment'),
     path('api/comments/<int:comment_id>/', views.delete_comment, name='delete_comment'),
 ]
-
