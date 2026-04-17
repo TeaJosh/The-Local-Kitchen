@@ -22,7 +22,10 @@ export default function Header() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     }
@@ -39,30 +42,62 @@ export default function Header() {
 
   return (
     <nav className="bg-red-600 w-full z-10 relative">
-      <div className="grid grid-cols-3 h-16 items-center">
-
+      <div className="grid grid-cols-3 h-14 items-center">
         {/* Logo */}
-        <div className="flex items-center space-x-2" style={{ paddingLeft: "32px" }}>
-          <Image src="/icons/logo.svg" width={48} height={48} alt="Logo" className="h-12 w-12" />
-          <Link href="/" className="text-xl font-bold text-white" style={{ paddingLeft: "12px" }}>
-            The Local Kitchen
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/icons/TLKLogo.png"
+              width={110}
+              height={110}
+              alt="The Local Kitchen Logo"
+              className="h-13 w-40 object-contain"
+              priority
+            />
           </Link>
         </div>
 
         {/* Navigation Links */}
         <div className="flex items-center justify-center gap-8 font-medium">
-          <Link href="/" className="text-white text-base hover:text-gray-200 transition">Home</Link>
-          <Link href="/about" className="text-white text-base hover:text-gray-200 transition">About</Link>
-          <Link href="/blog" className="text-white text-base hover:text-gray-200 transition">Blog</Link>
-          <Link href="/restaurants" className="text-white text-base hover:text-gray-200 transition">Restaurants</Link>
-          <Link href="/contact" className="text-white text-base hover:text-gray-200 transition">Contact</Link>
+          <Link
+            href="/"
+            className="text-white text-base hover:text-gray-200 transition"
+          >
+            Home
+          </Link>
+          <Link
+            href="/about"
+            className="text-white text-base hover:text-gray-200 transition"
+          >
+            About
+          </Link>
+          <Link
+            href="/posts"
+            className="text-white text-base hover:text-gray-200 transition"
+          >
+            Blog
+          </Link>
+          <Link
+            href="/restaurants"
+            className="text-white text-base hover:text-gray-200 transition"
+          >
+            Restaurants
+          </Link>
+          <Link
+            href="/contact"
+            className="text-white text-base hover:text-gray-200 transition"
+          >
+            Contact
+          </Link>
         </div>
 
         {/* Right side — Login or Avatar + Cart */}
-        <div className="flex items-center justify-end gap-4" style={{ paddingRight: "32px" }}>
+        <div
+          className="flex items-center justify-end gap-4"
+          style={{ paddingRight: "32px" }}
+        >
           {user ? (
             <div className="relative" ref={dropdownRef}>
-
               {/* Avatar button */}
               <button
                 type="button"
@@ -110,50 +145,84 @@ export default function Header() {
                       )}
                     </div>
                     <div>
-                      <h6 className="text-gray-800 text-base font-semibold">{user.username}</h6>
+                      <h6 className="text-gray-800 text-base font-semibold">
+                        {user.username}
+                      </h6>
                       <small className="text-gray-400">Member</small>
                     </div>
                   </li>
 
                   <li>
-                    <Link href="/account/settings/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/account/settings/profile"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       My Profile
                     </Link>
                   </li>
                   <li>
-                    <Link href="/account/settings/account" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/account/settings/account"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       Account Settings
                     </Link>
                   </li>
                   <li>
-                    <Link href="/account/settings/notifications" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/account/settings/notifications"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       Notifications
                     </Link>
                   </li>
                   <li className="flex items-center gap-3 px-4 py-3 border-b border-gray-200"></li>
                   <li>
-                    <Link href="/blog/create-post" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/posts/create-post"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       Create Post
                     </Link>
                   </li>
                   <li>
-                    <Link href="/blog/my-posts" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/posts/my-posts"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       My Posts
                     </Link>
                   </li>
                   <li>
-                    <Link href="/blog/saved-posts" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/posts/saved-posts"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       Saved Posts
                     </Link>
                   </li>
                   <li className="flex items-center gap-3 px-4 py-3 border-b border-gray-200"></li>
                   <li>
-                    <Link href="/account/settings/order-history" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/account/settings/order-history"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       Order History
                     </Link>
                   </li>
                   <li>
-                    <Link href="/help-center" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/help-center"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
                       Help Center
                     </Link>
                   </li>
@@ -180,10 +249,15 @@ export default function Header() {
 
           {/* Cart */}
           <Link href="/cart">
-            <Image src="/icons/cart.svg" width={48} height={48} alt="Cart" className="h-7 w-7" />
+            <Image
+              src="/icons/cart.svg"
+              width={48}
+              height={48}
+              alt="Cart"
+              className="h-7 w-7"
+            />
           </Link>
         </div>
-
       </div>
     </nav>
   );

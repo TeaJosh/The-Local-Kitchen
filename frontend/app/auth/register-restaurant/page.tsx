@@ -2,8 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const phoneRegex = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 export default function Register() {
   const router = useRouter();
@@ -20,11 +22,24 @@ export default function Register() {
     confirmPassword: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const [phoneTouched, setPhoneTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const phoneValid = phoneRegex.test(formData.phoneNumber);
+  const passwordValid = passwordRegex.test(formData.password);
+
+  const passwordCriteria = {
+    length: formData.password.length >= 8,
+    uppercase: /[A-Z]/.test(formData.password),
+    lowercase: /[a-z]/.test(formData.password),
+    number: /\d/.test(formData.password),
+    specialChar: /[@$!%*?&]/.test(formData.password),
+  };
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -38,6 +53,7 @@ export default function Register() {
     }));
 
     if (name === "phoneNumber") setPhoneTouched(true);
+    if (name === "password") setPasswordTouched(true);
   }
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
@@ -51,6 +67,11 @@ export default function Register() {
 
     if (formData.phoneNumber && !phoneValid) {
       setError("Please enter a valid phone number.");
+      return;
+    }
+
+    if (formData.password && !passwordValid) {
+      setError("Password must include at least one uppercase, one lowercase, one number, and one special character.");
       return;
     }
 
@@ -129,7 +150,7 @@ export default function Register() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                    className="w-full bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                     style={{ padding: "18px 20px", fontSize: "16px" }}
                   />
                 </div>
@@ -141,7 +162,7 @@ export default function Register() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                    className="w-full bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                     style={{ padding: "18px 20px", fontSize: "16px" }}
                   />
                 </div>
@@ -157,7 +178,7 @@ export default function Register() {
                   maxLength={254}
                   value={formData.email}
                   onChange={handleChange}
-                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  className="w-full bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
                 />
               </div>
@@ -173,7 +194,7 @@ export default function Register() {
                   maxLength={30}
                   value={formData.username}
                   onChange={handleChange}
-                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  className="w-full bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
                 />
               </div>
@@ -187,7 +208,7 @@ export default function Register() {
                   name="restaurantName"
                   value={formData.restaurantName}
                   onChange={handleChange}
-                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  className="w-full bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
                 />
               </div>
@@ -201,7 +222,7 @@ export default function Register() {
                   name="restaurantAddress"
                   value={formData.restaurantAddress}
                   onChange={handleChange}
-                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  className="w-full bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
                 />
               </div>
@@ -216,7 +237,7 @@ export default function Register() {
                   maxLength={16}
                   title="Phone number format: +1 123-456-7890"
                   onChange={handleChange}
-                  className={`rounded-xl focus:outline-none transition duration-300 ease
+                  className={`w-full rounded-xl focus:outline-none transition duration-300 ease
                     ${phoneTouched && formData.phoneNumber.length > 0
                       ? phoneValid
                         ? "bg-transparent text-green-500 border border-green-200 focus:border-green-500 hover:border-green-300 focus:shadow shadow-sm"
@@ -245,17 +266,59 @@ export default function Register() {
               {/* Password */}
               <div className="flex flex-col" style={{ gap: "8px" }}>
                 <label className="text-sm font-semibold text-gray-500">Password</label>
-                <input
-                  required
-                  type="password"
-                  name="password"
-                  minLength={8}
-                  maxLength={64}
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                  style={{ padding: "18px 20px", fontSize: "16px" }}
-                />
+                <div className="relative">
+                  <input
+                    required
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    minLength={8}
+                    maxLength={64}
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full rounded-xl focus:outline-none transition duration-300 ease
+                    ${passwordTouched && formData.password.length > 0
+                        ? passwordValid
+                          ? "bg-transparent text-green-500 border border-green-200 focus:border-green-500 hover:border-green-300 focus:shadow shadow-sm"
+                          : "bg-transparent text-red-500 border border-red-200 focus:border-red-500 hover:border-red-300 focus:shadow shadow-sm"
+                        : "bg-gray-100 text-gray-700 focus:ring-2 focus:ring-blue-500"
+                      }`}
+                    style={{ padding: "18px 20px", fontSize: "16px" }}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+
+                {/* Password strength Feedback */}
+                {passwordTouched && formData.password.length > 0 && (
+                  <ul className="mt-1 space-y-1 text-xs">
+                    {[
+                      { key: "length", label: "At least 8 characters" },
+                      { key: "uppercase", label: "One uppercase letter (A–Z)" },
+                      { key: "lowercase", label: "One lowercase letter (a–z)" },
+                      { key: "number", label: "One number (0–9)" },
+                      { key: "specialChar", label: "One special character (@$!%*?&)" },
+                    ].map(({ key, label }) => (
+                      <li
+                        key={key}
+                        className={`flex items-center gap-2 ${passwordCriteria[key as keyof typeof passwordCriteria]
+                            ? "text-green-500"
+                            : "text-red-500"
+                          }`}
+                      >
+                        <span className="font-bold">
+                          {passwordCriteria[key as keyof typeof passwordCriteria] ? "✓" : "✗"}
+                        </span>
+                        {label}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {/* Confirm Password */}
@@ -269,7 +332,7 @@ export default function Register() {
                   maxLength={64}
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
+                  className="w-full bg-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                   style={{ padding: "18px 20px", fontSize: "16px" }}
                 />
               </div>

@@ -1,7 +1,10 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+import uuid
 
 
+# USER PROFILES
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -119,25 +122,94 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity}x {self.menu_item.name}"
 
-
+# BLOG
 class BlogPost(models.Model):
+    SECTION_CHOICES = [
+        ('guides', 'Guides'),
+        ('reviews', 'Reviews'),
+        ('news', 'News'),
+    ]
+
+    OCCASION_CHOICES = [
+        ('date_night', 'Date Night'),
+        ('fine_dining', 'Fine Dining'),
+        ('group_dining', 'Group Dining'),
+        ('quick_bite', 'Quick Bite'),
+        ('business', 'Business'),
+    ]
+
+    CUISINE_CHOICES = [
+        ('all', 'All Cuisines'),
+        ('american', 'American'),
+        ('bar', 'Bar'),
+        ('italian', 'Italian'),
+        ('asian', 'Asian'),
+        ('pizza', 'Pizza'),
+        ('japanese', 'Japanese'),
+        ('chinese', 'Chinese'),
+        ('mexican', 'Mexican'),
+        ('seafood', 'Seafood'),
+        ('sushi', 'Sushi'),
+        ('cafe', 'Cafe'),
+        ('fast_food', 'Fast Food'),
+        ('french', 'French'),
+        ('indian', 'Indian'),
+        ('thai', 'Thai'),
+        ('korean', 'Korean'),
+        ('middle_eastern', 'Middle Eastern'),
+        ('greek', 'Greek'),
+        ('fusion', 'Fusion'),
+        ('barbecue', 'Barbecue'),
+        ('vietnamese', 'Vietnamese'),
+        ('turkish', 'Turkish'),
+        ('ethiopian', 'Ethiopian'),
+        ('brazilian', 'Brazilian'),
+        ('german', 'German'),
+        ('british', 'British'),
+        ('other', 'Other'),
+    ]
+
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.SET_NULL, null=True, blank=True)
+
     title = models.CharField(max_length=300)
+    subheading = models.CharField(max_length=500, blank=True)
+    image = models.URLField(max_length=500, blank=True, null=True, default='')
     content = models.TextField()
+
+    section = models.CharField(max_length=50, choices=SECTION_CHOICES, default='guides')
+    cuisine = models.CharField(max_length=50, choices=CUISINE_CHOICES, default='all')
+    occasion = models.CharField(max_length=50, choices=OCCASION_CHOICES, default='all')
+
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+
+    allow_comments = models.BooleanField(default=True)
+    is_anonymous = models.BooleanField(default=False)
+
+    is_draft = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
-
-
+        
 class Comment(models.Model):
-    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name="comments")
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.author} on {self.post.title}"
-    
+        return f"{self.author.user.username} on {self.post.title}"
+
+# Token Authentication
+class AuthToken(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    key = models.CharField(max_length=64, unique=True, default=uuid.uuid4) #generate a unique token key using uuid4
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Token for {self.user.email}"

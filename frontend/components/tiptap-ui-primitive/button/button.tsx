@@ -58,9 +58,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const shortcuts = useMemo<string[]>(
-      () => parseShortcutKeys({ shortcutKeys }),
+      () => shortcutKeys ? parseShortcutKeys(shortcutKeys).split("+") : [],
       [shortcutKeys]
     )
+
 
     if (!tooltip || !showTooltip) {
       return (
