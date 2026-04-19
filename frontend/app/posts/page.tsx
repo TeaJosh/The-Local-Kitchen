@@ -14,13 +14,13 @@ export default async function Blog() {
     const posts = await getPosts();
 
     return (
-        <div className="max-w-4xl mx-auto p-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold">Blog</h1>
             </div>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {posts.length === 0 && (
-                    <p className="text-gray-500">No posts yet.</p>
+                    <p className="text-gray-500 col-span-full">No posts yet.</p>
                 )}
                 {posts.map((
                     post: {
@@ -36,42 +36,41 @@ export default async function Blog() {
                         author: string;
                         created_at: string
                     }) => (
-                    <Link key={post.id} href={`/posts/${post.id}`}>
-                        <div className="border rounded-lg p-6 hover:bg-slate-50">
-
+                    <Link key={post.id} href={`/posts/${post.id}`} className="block">
+                        <div className="flex flex-col">
                             {post.image && (
                                 <Image
                                     src={post.image}
-                                    width={500}
-                                    height={500}
+                                    width={250}
+                                    height={250}
                                     alt="Blog card image"
+                                    className="w-full h-48 object-cover rounded-md mb-3"
                                 />
-                            )}
+                            )} 
 
-                            {/* Tags */}
-                            <div className="flex gap-2 mb-2">
-                                <span className="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
-                                    {post.section}
-                                </span>
-                                <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
-                                    {post.cusine}
-                                </span>
-                                <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
-                                    {post.occasion}
-                                </span>
-                            </div>
+                                {/* Tags */}
+                                <div className="flex gap-2 mb-2 flex-wrap">
+                                    <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
+                                        {post.section}
+                                    </span>
+                                    <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
+                                        {post.cusine}
+                                    </span>
+                                    <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
+                                        {post.occasion}
+                                    </span>
+                                </div>
 
-                            <h2 className="text-2xl font-bold">{post.title}</h2>
-                            <p className="text-xs text-gray-500">{post.city}, {post.state}</p>
-                            <p className="text-gray-500">{post.subheading}</p>
+                                <h2 className="text-2xl font-bold">{post.title}</h2>
+                                <p className="text-xs text-gray-500">{post.city}, {post.state}</p>
+                                <p className="text-gray-500">{post.subheading}</p>
 
-                            {/* Author + Date */}
-                            <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
-                                <span>By {post.author}</span>
-                                <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                            </div>
-
-                        </div>
+                                {/* Author + Date */}
+                                <div className="flex justify-between items-center text-sm text-gray-500 mt-2">
+                                    <span>By {post.author}</span>
+                                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                                </div>
+                            </div> 
                     </Link>
                 ))}
             </div>
