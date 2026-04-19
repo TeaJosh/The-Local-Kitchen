@@ -22,9 +22,23 @@ export default async function Blog() {
                 {posts.length === 0 && (
                     <p className="text-gray-500">No posts yet.</p>
                 )}
-                {posts.map((post: { id: string; image: string; title: string; subheading: string; city: string; state: string; created_at: string }) => (
+                {posts.map((
+                    post: {
+                        id: string;
+                        image: string;
+                        section: string;
+                        cusine: string;
+                        occasion: string;
+                        title: string;
+                        subheading: string;
+                        city: string;
+                        state: string;
+                        author: string;
+                        created_at: string
+                    }) => (
                     <Link key={post.id} href={`/posts/${post.id}`}>
                         <div className="border rounded-lg p-6 hover:bg-slate-50">
+
                             {post.image && (
                                 <Image
                                     src={post.image}
@@ -33,12 +47,30 @@ export default async function Blog() {
                                     alt="Blog card image"
                                 />
                             )}
+
+                            {/* Tags */}
+                            <div className="flex gap-2 mb-2">
+                                <span className="px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
+                                    {post.section}
+                                </span>
+                                <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                                    {post.cusine}
+                                </span>
+                                <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                                    {post.occasion}
+                                </span>
+                            </div>
+
                             <h2 className="text-2xl font-bold">{post.title}</h2>
+                            <p className="text-xs text-gray-500">{post.city}, {post.state}</p>
                             <p className="text-gray-500">{post.subheading}</p>
-                            <p className="text-base text-gray-500">{post.city}, {post.state}</p>
-                            <p className="text-base text-slate-500 mt-2">
-                                {new Date(post.created_at).toLocaleDateString()}
-                            </p>
+
+                            {/* Author + Date */}
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                                <span>By {post.author}</span>
+                                <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                            </div>
+
                         </div>
                     </Link>
                 ))}
