@@ -22,7 +22,20 @@ export default async function Blog() {
                 {posts.length === 0 && (
                     <p className="text-gray-500">No posts yet.</p>
                 )}
-                {posts.map((post: { id: string; image: string; title: string; subheading: string; city: string; state: string; created_at: string }) => (
+                {posts.map((
+                    post: { 
+                        id: string; 
+                        image: string; 
+                        section: string;
+                        cusine: string;
+                        occasion: string; 
+                        title: string; 
+                        subheading: string; 
+                        city: string; 
+                        state: string; 
+                        author: string; 
+                        created_at: string 
+                    }) => (
                     <Link key={post.id} href={`/posts/${post.id}`}>
                         <div className="border rounded-lg p-6 hover:bg-slate-50">
                             {post.image && (
@@ -33,12 +46,15 @@ export default async function Blog() {
                                     alt="Blog card image"
                                 />
                             )}
-                            <h2 className="text-2xl font-bold">{post.title}</h2>
+                            <p className="text-gray-500">{post.section}, {post.cusine}, {post.occasion}</p>
+                            <h2 className="text-2xl font-bold">{post.title}</h2> 
+                            <p className="text-xs text-gray-500">{post.city}, {post.state}</p>
+                            
                             <p className="text-gray-500">{post.subheading}</p>
-                            <p className="text-base text-gray-500">{post.city}, {post.state}</p>
                             <p className="text-base text-slate-500 mt-2">
                                 {new Date(post.created_at).toLocaleDateString()}
                             </p>
+                            <p className="text-gray-500">By {post.author}</p>
                         </div>
                     </Link>
                 ))}

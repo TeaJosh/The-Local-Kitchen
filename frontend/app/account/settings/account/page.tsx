@@ -51,13 +51,20 @@ export default function AccountPage() {
                 Authorization: `Token ${token}`
             }
         })
-            .then(res => {
-                if (!res.ok) throw new Error("Unauthorized");
+            .then(async (res) => {
+                if (res.status === 401 || res.status === 403) {
+                    throw new Error("Unauthorized");
+                }
+
+                if (!res.ok) {
+                    throw new Error("Server error");
+                }
+
                 return res.json();
             })
             .then(data => {
                 setUsername(data.username);
-                setEmail(data.email);
+                setEmail(data.email ?? "Not set");
 
                 setAccountCreated(
                     new Date(data.date_joined).toLocaleDateString(undefined, {
@@ -67,9 +74,14 @@ export default function AccountPage() {
                     })
                 );
             })
-            .catch(() => {
-                localStorage.removeItem("token");
-                router.push("/auth/login");
+            .catch((err) => {
+                console.error("Profile fetch failed:", err);
+
+                // ONLY logout if truly unauthorized
+                if (err.message === "Unauthorized") {
+                    localStorage.removeItem("token");
+                    router.push("/auth/login");
+                }
             });
     }, [router]);
 
@@ -101,11 +113,8 @@ export default function AccountPage() {
             if (!res.ok) throw new Error("Failed to change email");
 
             alert("Email changed successfully.");
-            
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-
-            router.push("/auth/login");
+            setEmail(newEmail);
+            setNewEmail(""); setConfirmNewEmail(""); setEmailPassword("");
 
         } catch {
             alert("Failed to change email.");
@@ -140,11 +149,7 @@ export default function AccountPage() {
             if (!res.ok) throw new Error("Failed to change password");
 
             alert("Password changed successfully.");
-            
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-
-            router.push("/auth/login");
+            setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword("");
 
         } catch {
             alert("Failed to change password.");
@@ -163,7 +168,7 @@ export default function AccountPage() {
             localStorage.removeItem("user");
 
             router.push("/");
-            
+
         } catch {
             setShowModal(false);
             alert("Failed to delete account.");
