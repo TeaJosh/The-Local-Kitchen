@@ -1,10 +1,12 @@
 "use client";
+
 import Link from "next/link"
 import Image from "next/image"
 import type { Editor } from "@tiptap/react";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useNsfwCheck } from "@/hooks/use-nsfw-check";
 
 const CUISINES = [
     "American", "Bar", "Italian", "Asian", "Pub", "Pizza", "Japanese",
@@ -41,6 +43,7 @@ export default function CreatePost() {
     const [editor, setEditor] = useState<Editor | null>(null);
     const [saving, setSaving] = useState(false);
     const [imgSrc, setImgSrc] = useState<string | null>(null);
+    const { checkImage, ready } = useNsfwCheck();
     const fileRef = useRef<HTMLInputElement>(null);
 
     // Tags dropdown
@@ -68,12 +71,27 @@ export default function CreatePost() {
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) {
-            alert("No file selected. Please choose a file.");
-            return;
-        }
+        if (!file) return alert("No file selected. Please choose a file.");
+
+        if (!ready) return alert("NSFW model is still loading. Try again in a moment.");
+
         const reader = new FileReader();
-        reader.onloadend = () => setImgSrc(reader.result as string);
+        reader.onloadend = () => {
+            const base64 = reader.result as string;
+            const img = new window.Image();
+            img.src = base64;
+
+            img.onload = async () => {
+                const isNsfw = await checkImage(img);
+                if (isNsfw) {
+                    alert("This image contains inappropriate content and cannot be uploaded.");
+                    if (fileRef.current) fileRef.current.value = "";
+                    return;
+                }
+                setImgSrc(base64);
+            };
+        };
+
         reader.readAsDataURL(file);
     };
 
@@ -81,7 +99,7 @@ export default function CreatePost() {
         c.toLowerCase().includes(cuisineSearch.toLowerCase())
     );
 
-const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!title.trim() || !editor) {
             alert("Please fill in title and content");
