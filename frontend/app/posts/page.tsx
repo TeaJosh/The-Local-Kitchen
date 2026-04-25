@@ -48,7 +48,7 @@ export default async function Blog() {
                         id: string;
                         image: string;
                         section: string;
-                        cusine: string;
+                        cuisine: string;
                         occasion: string;
                         title: string;
                         subheading: string;
@@ -79,7 +79,7 @@ export default async function Blog() {
                                     {post.section}
                                 </span>
                                 <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
-                                    {post.cusine}
+                                    {post.cuisine}
                                 </span>
                                 <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
                                     {post.occasion}

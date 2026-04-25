@@ -9,13 +9,11 @@
  */
 async function getPost(id: string) {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  const res = await fetch(`${baseUrl}/api/posts/${id}/`, {
-    cache: "no-store",
-  });
-
+  const url = `${baseUrl}/api/posts/${id}/`;
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) return null;
-  return res.json();
+  const data = await res.json();
+  return data.post ?? null; // API returns { post: {...} } on success, or { error: "Not found" } on failure
 }
 
 /**
@@ -28,9 +26,10 @@ async function getPost(id: string) {
 export default async function Page({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>; // Next.js 15: params is a promise that resolves to an object containing route parameters, including the post ID
 }) {
-  const post = await getPost(params.id);
+  const { id } = await params; // Must await before accessing .id
+  const post = await getPost(id);
 
   /* Handle missing or invalid post response */
   if (!post) return <div className="p-8">Post not found</div>;
@@ -40,10 +39,16 @@ export default async function Page({
       <h1 className="text-3xl font-bold">{post.title}</h1>
       <p className="text-gray-500">{post.heading}</p>
       <p className="text-gray-500">{post.subheading}</p>
+      <p className="text-gray-500">By {post.author}</p>
+      <p className="text-gray-500">{new Date(post.created_at).toLocaleDateString()}</p>
 
       {/* Featured image (if available) */}
-      {post.imgSrc && (
-        <img src={post.imgSrc} className="mt-4 rounded-xl" />
+      {post.image && (
+        <img
+          src={post.image}
+          alt={post.title}
+          className="mt-4 rounded-xl"
+        />
       )}
 
       {/*
@@ -53,7 +58,7 @@ export default async function Page({
       */}
 
       <div
-        className="prose mt-6"
+        className="prose prose-neutral mx-auto mt-6"
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
