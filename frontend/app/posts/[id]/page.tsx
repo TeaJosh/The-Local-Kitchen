@@ -47,7 +47,7 @@ export default async function Page({
         <img
           src={post.image}
           alt={post.title}
-          className="mt-4 rounded-xl"
+          className="mt-6 rounded-xl w-full max-h-[500px] object-cover"
         />
       )}
 

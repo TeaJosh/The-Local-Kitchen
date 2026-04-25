@@ -27,7 +27,7 @@ export default function Footer() {
             <h2 className="font-bold text-lg mb-6">Explore</h2>
             <ul className="flex flex-col gap-2 text-base text-red-100">
               <li><Link href="/restaurants" className="hover:text-white transition">Restaurants</Link></li>
-              <li><Link href="/blog" className="hover:text-white transition">Blog</Link></li>
+              <li><Link href="/posts" className="hover:text-white transition">Blog</Link></li>
               <li><Link href="/community" className="hover:text-white transition">Community</Link></li>
             </ul>
           </div>
@@ -59,7 +59,7 @@ export default function Footer() {
       {/* Divider */}
       <div className="w-full mx-auto my-8 border-b-2 border-red-400" />
 
-      {/* Bottom Section */}
+      {/* Social links */}
       <div className="w-full px-8 py-6 flex flex-col items-center gap-2">
         <div className="flex justify-center gap-6 text-xl" style={{ marginTop: "12px"}}>
           <a href="#" className="hover:text-gray-200"><FaFacebook /></a>

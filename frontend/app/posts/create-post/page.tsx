@@ -30,9 +30,16 @@ const CUISINES = [
     "Burmese", "Kolkati", "Portuguese",
 ];
 
+/**
+ * CreatePost — Allows authenticated users to create a new blog post.
+ * @param props - None
+ */
 export default function CreatePost() {
     useEffect(() => {
+        // Check for token in localStorage to verify if user is authenticated
         const token = localStorage.getItem("token");
+
+        // Redirect to login if no token found (user not authenticated)
         if (!token) router.push("/auth/login");
     }, []);
 
@@ -43,6 +50,8 @@ export default function CreatePost() {
     const [editor, setEditor] = useState<Editor | null>(null);
     const [saving, setSaving] = useState(false);
     const [imgSrc, setImgSrc] = useState<string | null>(null);
+
+    // NSFW hook loads the model client-side and validates uploaded images.
     const { checkImage, ready } = useNsfwCheck();
     const fileRef = useRef<HTMLInputElement>(null);
 
@@ -73,14 +82,18 @@ export default function CreatePost() {
         const file = e.target.files?.[0];
         if (!file) return alert("No file selected. Please choose a file.");
 
+        // User can only upload an image after the NSFW model has loaded.
         if (!ready) return alert("NSFW model is still loading. Try again in a moment.");
 
         const reader = new FileReader();
+
+        // Convert uploaded image to base64 string for NSFW check and preview.
         reader.onloadend = () => {
             const base64 = reader.result as string;
             const img = new window.Image();
             img.src = base64;
 
+            // Wait for image to load before checking for NSFW content.
             img.onload = async () => {
                 const isNsfw = await checkImage(img);
                 if (isNsfw) {
@@ -148,7 +161,7 @@ export default function CreatePost() {
 
             {/* Back to Posts */}
             <Link
-                href="/posts"
+                href="/posts/"
                 className="absolute top-6 left-6 inline-flex items-center gap-1 text-gray-500 hover:text-gray-800 transition"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
