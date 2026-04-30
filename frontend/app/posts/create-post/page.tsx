@@ -7,6 +7,8 @@ import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useNsfwCheck } from "@/hooks/use-nsfw-check";
+import { FaXmark } from "react-icons/fa6";
+import { IconContext } from "react-icons/lib";
 
 const CUISINES = [
     "American", "Bar", "Italian", "Asian", "Pub", "Pizza", "Japanese",
@@ -30,9 +32,15 @@ const CUISINES = [
     "Burmese", "Kolkati", "Portuguese",
 ];
 
+const SECTIONS = ["Local Spotlights", "Guides", "Reviews", "No Preference"] as const;
+
+const CONTENT_MIN = 2000;
+const CONTENT_MAX = 10000;
+
 /**
  * CreatePost — Allows authenticated users to create a new blog post.
- * @param props - None
+ * Section field is optional and can be used to specify the general category of the post (Guides, Reviews, Vibes).
+ * Tags (Cuisine, Occasion, Vibes) are optional and can be used to further categorize the post.
  */
 export default function CreatePost() {
     useEffect(() => {
@@ -48,6 +56,7 @@ export default function CreatePost() {
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
     const [editor, setEditor] = useState<Editor | null>(null);
+    const [charCount, setCharCount] = useState(0);
     const [saving, setSaving] = useState(false);
     const [imgSrc, setImgSrc] = useState<string | null>(null);
 
@@ -55,14 +64,19 @@ export default function CreatePost() {
     const { checkImage, ready } = useNsfwCheck();
     const fileRef = useRef<HTMLInputElement>(null);
 
+    // Section — determines which blog page header this post belongs to.
+    // Authors pick one of: Local Spotlights, Guides, Vibes.
+    // Editor's Picks and Trending Now are applied algorithmically — not set here.
+    const [selectedSection, setSelectedSection] = useState<string | null>(null);
+
+    // Tags — for display on the card and filtering only. Does not determine section placement.
+    const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
+    const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
+    const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+
     // Tags dropdown
     const [open, setOpen] = useState(false);
     const [subOpen, setSubOpen] = useState<string | null>(null);
-
-    // One selection per group
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
-    const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
 
     // Comments & privacy
     const [comments, setComments] = useState<string>("1");
@@ -72,8 +86,9 @@ export default function CreatePost() {
     const [cuisineOpen, setCuisineOpen] = useState(false);
     const [cuisineSearch, setCuisineSearch] = useState("");
 
-    // Draft state
-    const [isDraft, setIsDraft] = useState(false);
+    // Use a ref instead of state to avoid the race condition where
+    // setIsDraft(true) hasn't updated by the time handleSubmit fires
+    const isDraftRef = useRef(false);
     const formRef = useRef<HTMLFormElement>(null);
 
     const router = useRouter();
@@ -82,18 +97,18 @@ export default function CreatePost() {
         const file = e.target.files?.[0];
         if (!file) return alert("No file selected. Please choose a file.");
 
-        // User can only upload an image after the NSFW model has loaded.
+        // User can only upload an image after the NSFW model has loaded
         if (!ready) return alert("NSFW model is still loading. Try again in a moment.");
 
         const reader = new FileReader();
 
-        // Convert uploaded image to base64 string for NSFW check and preview.
+        // Convert uploaded image to base64 string for NSFW check and preview
         reader.onloadend = () => {
             const base64 = reader.result as string;
             const img = new window.Image();
             img.src = base64;
 
-            // Wait for image to load before checking for NSFW content.
+            // Wait for image to load before checking for NSFW content
             img.onload = async () => {
                 const isNsfw = await checkImage(img);
                 if (isNsfw) {
@@ -118,6 +133,26 @@ export default function CreatePost() {
             alert("Please fill in title and content");
             return;
         }
+
+        // Section is required — it determines the blog page header placement
+        if (!selectedSection) {
+            alert("Please select a section, or choose 'No Preference'.");
+            return;
+        }
+
+        // Only enforce content length when publishing, not when saving a draft
+        if (!isDraftRef.current) {
+            const contentText = editor.getText();
+            if (contentText.length < CONTENT_MIN) {
+                alert(`Content is too short. Minimum ${CONTENT_MIN} characters (currently using ${contentText.length} characters).`);
+                return;
+            }
+            if (contentText.length > CONTENT_MAX) {
+                alert(`Content is too long. Maximum ${CONTENT_MAX} characters (currently using ${contentText.length} characters).`);
+                return;
+            }
+        }
+
         setSaving(true);
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts/create/`, {
@@ -130,19 +165,20 @@ export default function CreatePost() {
                     title,
                     subheading: heading,
                     image: imgSrc,
-                    section: selectedCategory,
+                    section: selectedSection,
                     cuisine: selectedCuisine,
                     occasion: selectedOccasion,
+                    vibe: selectedVibe,
                     city,
                     state,
                     content: editor.getHTML(),
                     allow_comments: comments === "1",
                     is_anonymous: privacy === "1",
-                    is_draft: isDraft,
+                    is_draft: isDraftRef.current,
                     tags: {
-                        category: selectedCategory,
                         cuisine: selectedCuisine,
                         occasion: selectedOccasion,
+                        vibe: selectedVibe,
                     },
                 }),
             });
@@ -180,6 +216,8 @@ export default function CreatePost() {
                         <input
                             type="text"
                             placeholder="Enter your blog post title here"
+                            minLength={8}
+                            maxLength={100}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             className="w-full border border-gray-300 rounded px-4 py-3 text-base"
@@ -192,6 +230,8 @@ export default function CreatePost() {
                         <input
                             type="text"
                             placeholder="Enter a subheading for your post"
+                            minLength={10}
+                            maxLength={300}
                             value={heading}
                             onChange={(e) => setHeading(e.target.value)}
                             className="w-full border border-gray-300 rounded px-4 py-3 text-base"
@@ -203,14 +243,16 @@ export default function CreatePost() {
                         <label className="text-base font-semibold text-gray-500">Thumbnail</label>
 
                         {imgSrc && (
-                            <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-200">
+                            <div className="relative w-full h-128 rounded-lg overflow-hidden border border-gray-200">
                                 <Image src={imgSrc} fill className="object-cover" alt="Thumbnail preview" />
                                 <button
                                     type="button"
                                     onClick={() => { setImgSrc(null); if (fileRef.current) fileRef.current.value = ""; }}
                                     className="absolute top-2 right-2 bg-white text-gray-700 rounded-full px-2 py-1 text-medium shadow hover:bg-gray-100"
                                 >
-                                    Remove
+                                    <IconContext.Provider value={{ size: "24px" }}>
+                                        <FaXmark />
+                                    </IconContext.Provider>
                                 </button>
                             </div>
                         )}
@@ -245,8 +287,21 @@ export default function CreatePost() {
                     <div className="flex flex-col gap-1">
                         <label className="text-base font-semibold text-gray-500">Content</label>
                         <div className="w-full border rounded-lg overflow-y-auto h-[500px]">
-                            <SimpleEditor onEditorReady={(editor) => setEditor(editor)} />
+                            <SimpleEditor onEditorReady={(editor) => {
+                                setEditor(editor);
+                                // Track character count live as user types
+                                editor.on("update", () => setCharCount(editor.getText().length));
+                            }} />
                         </div>
+                        {/* Live character counter */}
+                        <p className={`text-xs mt-1 ${charCount < CONTENT_MIN || charCount > CONTENT_MAX
+                            ? "text-red-500"
+                            : "text-green-500"
+                            }`}>
+                            {charCount} / {CONTENT_MAX} characters
+                            {charCount < CONTENT_MIN && ` (minimum ${CONTENT_MIN})`}
+                            {charCount > CONTENT_MAX && ` (over limit by ${charCount - CONTENT_MAX})`}
+                        </p>
                     </div>
 
                     {/* City + State */}
@@ -333,6 +388,40 @@ export default function CreatePost() {
 
                     <hr className="border-gray-200" />
 
+                    {/* Section — required, determines blog page header placement */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-base font-semibold text-gray-500">Section</label>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-base font-semibold text-gray-500"></label>
+                            <p className="text-xs text-gray-400">
+                                Choose where this post appears on the blog page. Selecting "No Preference"
+                                will place your post in Latest Posts and More Posts automatically.
+                            </p>
+                        </div>
+                        <div className="flex gap-3 flex-wrap">
+                            {SECTIONS.map((section) => (
+                                <button
+                                    key={section}
+                                    type="button"
+                                    onClick={() => setSelectedSection(prev => prev === section ? null : section)}
+                                    className={`px-4 py-2 rounded-full border text-sm font-medium transition-all
+                                        ${selectedSection === section
+                                            ? "bg-black text-white border-black"
+                                            : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
+                                        }`}
+                                >
+                                    {section}
+                                </button>
+                            ))}
+                        </div>
+                        {!selectedSection && (
+                            <p className="text-xs text-red-400">A section must be selected before posting.</p>
+                        )}
+                    </div>
+
+
+                    <hr className="border-gray-200" />
+
                     {/* Tags */}
                     <div className="flex flex-col gap-2">
                         <label className="text-base font-semibold text-gray-500">Tags</label>
@@ -347,36 +436,6 @@ export default function CreatePost() {
 
                             {open && (
                                 <div className="absolute top-full mt-2 w-56 bg-white border rounded-md shadow z-50">
-
-                                    {/* All Categories submenu */}
-                                    <div className="relative">
-                                        <button
-                                            type="button"
-                                            onClick={() => setSubOpen(subOpen === "categories" ? null : "categories")}
-                                            className="flex justify-between items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
-                                        >
-                                            <span>All Categories</span>
-                                            {selectedCategory && (
-                                                <span className="text-xs text-blue-600 font-semibold">(1)</span>
-                                            )}
-                                        </button>
-                                        {subOpen === "categories" && (
-                                            <div className="absolute left-full top-0 ml-1 w-48 bg-white border rounded-md shadow">
-                                                {["Guides", "Reviews", "News"].map(tag => (
-                                                    <button
-                                                        key={tag}
-                                                        type="button"
-                                                        onClick={() => setSelectedCategory(prev => prev === tag ? null : tag)}
-                                                        className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${selectedCategory === tag ? "font-semibold text-blue-600" : ""}`}
-                                                    >
-                                                        {selectedCategory === tag && <span>✓</span>}
-                                                        {tag}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
                                     {/* All Cuisines */}
                                     <button
                                         type="button"
@@ -388,6 +447,35 @@ export default function CreatePost() {
                                             <span className="text-xs text-blue-600 font-semibold">(1)</span>
                                         )}
                                     </button>
+
+                                    {/* All Vibes submenu */}
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setSubOpen(subOpen === "vibes" ? null : "vibes")}
+                                            className="flex justify-between items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
+                                        >
+                                            <span>All Vibes</span>
+                                            {selectedVibe && (
+                                                <span className="text-xs text-blue-600 font-semibold">(1)</span>
+                                            )}
+                                        </button>
+                                        {subOpen === "vibes" && (
+                                            <div className="absolute left-full top-0 ml-1 w-48 bg-white border rounded-md shadow">
+                                                {["Cozy", "Lively", "Modern"].map(tag => (
+                                                    <button
+                                                        key={tag}
+                                                        type="button"
+                                                        onClick={() => setSelectedVibe(prev => prev === tag ? null : tag)}
+                                                        className={`flex items-center gap-2 w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${selectedVibe === tag ? "font-semibold text-blue-600" : ""}`}
+                                                    >
+                                                        {selectedVibe === tag && <span>✓</span>}
+                                                        {tag}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
 
                                     {/* All Occasions submenu */}
                                     <div className="relative">
@@ -403,7 +491,7 @@ export default function CreatePost() {
                                         </button>
                                         {subOpen === "occasions" && (
                                             <div className="absolute left-full top-0 ml-1 w-48 bg-white border rounded-md shadow">
-                                                {["Date Night", "Fine Dining", "Group Dining", "Quick Bite", "Business"].map(tag => (
+                                                {["Date Night", "Fine Dining", "Group Dining", "Quick Bite", "Family-Friendly"].map(tag => (
                                                     <button
                                                         key={tag}
                                                         type="button"
@@ -421,13 +509,13 @@ export default function CreatePost() {
                             )}
                         </div>
 
-                        {/* Selected pills */}
-                        {(selectedCategory || selectedCuisine || selectedOccasion) && (
+                        {/* Selected tag pills */}
+                        {(selectedVibe || selectedCuisine || selectedOccasion) && (
                             <div className="flex flex-wrap gap-2 mt-1">
-                                {selectedCategory && (
+                                {selectedVibe && (
                                     <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-2 py-1 rounded-full border border-blue-200">
-                                        {selectedCategory}
-                                        <button type="button" onClick={() => setSelectedCategory(null)} className="hover:text-blue-900">×</button>
+                                        {selectedVibe}
+                                        <button type="button" onClick={() => setSelectedVibe(null)} className="hover:text-blue-900">×</button>
                                     </span>
                                 )}
                                 {selectedCuisine && (
@@ -449,26 +537,26 @@ export default function CreatePost() {
                     <div className="flex gap-4">
                         <button
                             type="submit"
-                            disabled={saving}
-                            onClick={() => setIsDraft(false)}
-                            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+                            disabled={saving || (charCount < CONTENT_MIN || charCount > CONTENT_MAX)}
+                            onClick={() => { isDraftRef.current = false; }}
+                            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {saving && !isDraft ? "Saving..." : "Post"}
+                            {saving && !isDraftRef.current ? "Saving..." : "Post"}
                         </button>
 
                         <button
                             type="button"
                             disabled={saving}
-                            onClick={() => { setIsDraft(true); formRef.current?.requestSubmit(); }}
-                            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+                            onClick={() => { isDraftRef.current = true; formRef.current?.requestSubmit(); }}
+                            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {saving && isDraft ? "Saving..." : "Save Post"}
+                            {saving && isDraftRef.current ? "Saving..." : "Save Draft"}
                         </button>
                     </div>
                 </form>
             </div>
 
-            {/* Cuisines List */}
+            {/* Cuisines Modal */}
             {cuisineOpen && (
                 <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30">
                     <div className="bg-white w-full max-w-sm rounded-t-2xl sm:rounded-2xl flex flex-col shadow-xl max-h-[90vh]">

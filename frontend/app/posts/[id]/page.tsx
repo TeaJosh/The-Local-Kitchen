@@ -35,42 +35,65 @@ export default async function Page({
   if (!post) return <div className="p-8">Post not found</div>;
 
   return (
-    <div className="max-w-3xl mx-auto p-8">
-      <h1 className="text-3xl font-bold">{post.title}</h1>
-      <p className="text-gray-500">{post.heading}</p>
-      <p className="text-gray-500">{post.subheading}</p>
-      <p className="text-gray-500">By {post.author}</p>
-      <p className="text-gray-500">{new Date(post.created_at).toLocaleDateString()}</p>
+    <main className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-[1fr_2fr] gap-12">
 
-      {/* Featured image (if available) */}
-      {post.image && (
-        <img
-          src={post.image}
-          alt={post.title}
-          className="mt-6 rounded-xl w-full max-h-[500px] object-cover"
-        />
-      )}
+        {/* Left gutter — empty or use for a sticky sidebar later */}
+        <aside className="hidden md:block" />
 
-      {/*
-        Post content rendered as trusted HTML from the backend CMS.
-        dangerouslySetInnerHTML is intentional here — content is authored
-        internally and sanitized server-side before storage.
-      */}
+        {/* Main content — sits on the right two-thirds */}
+        <article>
 
-      <div
-        className="prose prose-neutral mx-auto mt-6"
-        dangerouslySetInnerHTML={{ __html: post.content }}
-      />
+          {/* Title */}
+          <h1 className="text-4xl font-bold leading-tight">{post.title}</h1>
 
-      {/*
-        Comments section (currently disabled)
-        Uncomment when backend supports comments API
-      */}
-      {/*
-      {post.commentsEnabled && (
-        <Comments postId={post.id} currentUser="" />
-      )}
-        */}
-    </div>
+          {/* Meta */}
+          <div className="mt-4 text-gray-500 space-y-1 text-sm">
+            <p>{post.subheading}</p>
+            <p>By {post.author}</p>
+            <p>{new Date(post.created_at).toLocaleDateString()}</p>
+          </div>
+
+          {/* Featured image (if available) */}
+          {post.image && (
+            <img
+              src={post.image}
+              alt={post.title}
+              className="mt-8 rounded-xl w-full max-h-[500px] object-cover"
+            />
+          )}
+
+          {/*
+            Post content rendered as trusted HTML from the backend CMS.
+            dangerouslySetInnerHTML is intentional here — content is authored
+            internally and sanitized server-side before storage.
+          */}
+
+          <div
+            className="prose prose-lg max-w-none mt-10
+            [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4
+            [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-3
+            [&_h3]:text-xl  [&_h3]:font-bold [&_h3]:mb-2
+            [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4
+            [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-4
+            [&_li]:my-1
+            [&_strong]:font-bold
+            [&_p]:my-3 [&_p]:leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+
+          {/*
+            Comments section (currently disabled)
+            Uncomment when backend supports comments API
+          */}
+          {/*
+          {post.commentsEnabled && (
+            <Comments postId={post.id} currentUser="" />
+          )}
+          */}
+
+        </article>
+      </div>
+    </main>
   );
 }

@@ -50,6 +50,7 @@ export default async function Blog() {
                         section: string;
                         cuisine: string;
                         occasion: string;
+                        vibe: string;
                         title: string;
                         subheading: string;
                         city: string;
@@ -76,10 +77,10 @@ export default async function Blog() {
                             {/* Tags */}
                             <div className="flex gap-2 mb-2 flex-wrap">
                                 <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
-                                    {post.section}
+                                    {post.cuisine}
                                 </span>
                                 <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
-                                    {post.cuisine}
+                                    {post.vibe}
                                 </span>
                                 <span className="px-2 py-1 rounded-full bg-gray-200 text-xs font-semibold">
                                     {post.occasion}
@@ -90,7 +91,7 @@ export default async function Blog() {
                             <p className="text-xs text-gray-500">
                                 {post.city}, {post.state}
                             </p>
-                            <p className="text-gray-500">{post.subheading}</p>
+                            <p className="text-gray-500 line-clamp-3 overflow-hidden">{post.subheading}</p>
                             <div className="flex justify-between items-center text-sm text-gray-500 mt-2">
                                 <span>By {post.author}</span>
                                 <span>{new Date(post.created_at).toLocaleDateString()}</span>
