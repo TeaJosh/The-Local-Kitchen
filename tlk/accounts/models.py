@@ -177,9 +177,9 @@ class BlogPost(models.Model):
     image = models.URLField(max_length=500, blank=True, null=True, default='')
     content = models.TextField()
 
-    section = models.CharField(max_length=50, choices=SECTION_CHOICES, default='guides')
-    cuisine = models.CharField(max_length=50, choices=CUISINE_CHOICES, default='all')
-    occasion = models.CharField(max_length=50, choices=OCCASION_CHOICES, default='all')
+    section = models.CharField(max_length=50, choices=SECTION_CHOICES, default='guides', blank=True)
+    cuisine = models.CharField(max_length=50, choices=CUISINE_CHOICES, default='all', blank=True)
+    occasion = models.CharField(max_length=50, choices=OCCASION_CHOICES, default='all', blank=True)
 
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=100, blank=True)
