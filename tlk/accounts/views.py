@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import token_required
-from .models import CustomUser, Restaurant, BlogPost, AuthToken, Comment, BlogPostView, UserReport, ContactMessage, ContentReport
+from .models import CustomUser, Restaurant, BlogPost, AuthToken, Comment, BlogPostView, UserReport, ContactMessage
 import json
 
 
@@ -442,19 +442,3 @@ def report_user(request):
 
     return JsonResponse({'message': 'Report submitted successfully'})
 
-@csrf_exempt
-def report_content(request):
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-    data = json.loads(request.body)
-
-    ContentReport.objects.create(
-        reporter=data.get('reporter', 'Anonymous'),
-        post_id=data.get('post_id'),
-        content_link=data.get('content_link', ''),
-        reason=data.get('reason', ''),
-        description=data.get('description', ''),
-    )
-
-    return JsonResponse({'message': 'Content report submitted successfully'})

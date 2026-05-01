@@ -24,6 +24,5 @@ urlpatterns = [
 
     #Report and Contact URLs
     path('api/support/report-user/', views.report_user, name='report_user'),
-    path('api/support/report-content/', views.report_content, name='report_content'),
     path('api/contact/', views.contact_submit, name='contact_submit'),
 ]

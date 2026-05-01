@@ -242,17 +242,6 @@ class UserReport(models.Model):
     def __str__(self):
         return f"Report: {self.reported_user} — {self.subject}"
     
-class ContentReport(models.Model): #fields subject to change
-    reporter = models.CharField(max_length=100, default='Anonymous')
-    post_id = models.IntegerField(null=True, blank=True)
-    content_link = models.URLField(blank=True)
-    reason = models.CharField(max_length=200)
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Content Report: {self.reason}"
-    
 #Contact Page Model
 class ContactMessage(models.Model):
     reporter = models.CharField(max_length=100, default='Anonymous')
