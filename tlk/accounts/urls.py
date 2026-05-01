@@ -21,4 +21,9 @@ urlpatterns = [
     path('api/accounts/change_email/', views.change_email, name='change_email'),
     path('api/accounts/change_password/', views.change_password, name='change_password'),
     path('api/accounts/delete/', views.delete_account, name='delete_account'),
+
+    #Report and Contact URLs
+    path('api/support/report-user/', views.report_user, name='report_user'),
+    path('api/support/report-content/', views.report_content, name='report_content'),
+    path('api/contact/', views.contact_submit, name='contact_submit'),
 ]

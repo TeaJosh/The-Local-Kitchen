@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import token_required
-from .models import CustomUser, Restaurant, BlogPost, AuthToken, Comment, BlogPostView
+from .models import CustomUser, Restaurant, BlogPost, AuthToken, Comment, BlogPostView, UserReport, ContactMessage, ContentReport
 import json
 
 
@@ -402,3 +402,59 @@ def delete_comment(request, comment_id):
             return JsonResponse({'error': 'Not found'}, status=404)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+#Report and contact views
+@csrf_exempt
+def contact_submit(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    data = json.loads(request.body)
+
+    ContactMessage.objects.create(
+        reporter=data.get('reporter', 'Anonymous'),
+        full_name=data.get('full_name', ''),
+        email=data.get('email', ''),
+        phone_number=data.get('phoneNumber', ''),
+        subject=data.get('subject', ''),
+        message=data.get('message', ''),
+    )
+
+    return JsonResponse({'message': 'Contact message submitted successfully'})
+
+
+@csrf_exempt
+def report_user(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    data = json.loads(request.body)
+
+    UserReport.objects.create(
+        reporter=data.get('reporter', 'Anonymous'),
+        subject=data.get('subject', ''),
+        reported_user=data.get('reported_user', ''),
+        content_link=data.get('content_link', ''),
+        incident_date=data.get('incident_date') or None,
+        violation_types=data.get('violation_types', []),
+        description=data.get('description', ''),
+    )
+
+    return JsonResponse({'message': 'Report submitted successfully'})
+
+@csrf_exempt
+def report_content(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    data = json.loads(request.body)
+
+    ContentReport.objects.create(
+        reporter=data.get('reporter', 'Anonymous'),
+        post_id=data.get('post_id'),
+        content_link=data.get('content_link', ''),
+        reason=data.get('reason', ''),
+        description=data.get('description', ''),
+    )
+
+    return JsonResponse({'message': 'Content report submitted successfully'})

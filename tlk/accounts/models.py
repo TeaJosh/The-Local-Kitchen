@@ -227,6 +227,44 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.author.user.username} on {self.post.title}"
+    
+#Report User or Content
+class UserReport(models.Model):
+    reporter = models.CharField(max_length=100, default='Anonymous')
+    subject = models.CharField(max_length=100)
+    reported_user = models.CharField(max_length=30)
+    content_link = models.URLField()
+    incident_date = models.DateField(null=True, blank=True)
+    violation_types = models.JSONField(default=list)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Report: {self.reported_user} — {self.subject}"
+    
+class ContentReport(models.Model): #fields subject to change
+    reporter = models.CharField(max_length=100, default='Anonymous')
+    post_id = models.IntegerField(null=True, blank=True)
+    content_link = models.URLField(blank=True)
+    reason = models.CharField(max_length=200)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Content Report: {self.reason}"
+    
+#Contact Page Model
+class ContactMessage(models.Model):
+    reporter = models.CharField(max_length=100, default='Anonymous')
+    full_name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=20, blank=True)
+    subject = models.CharField(max_length=100)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.subject} — {self.email}"
 
 # Token Authentication
 class AuthToken(models.Model):
