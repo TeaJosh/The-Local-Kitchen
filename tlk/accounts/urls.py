@@ -15,4 +15,10 @@ urlpatterns = [
     path('api/posts/<int:post_id>/delete/', views.delete_blog_post, name='delete_post'),
     path('api/posts/<int:post_id>/comments/', views.add_comment, name='add_comment'),
     path('api/comments/<int:comment_id>/', views.delete_comment, name='delete_comment'),
+
+    #Account Management views
+    path('api/accounts/me/', views.me, name='me'),
+    path('api/accounts/change_email/', views.change_email, name='change_email'),
+    path('api/accounts/change_password/', views.change_password, name='change_password'),
+    path('api/accounts/delete/', views.delete_account, name='delete_account'),
 ]

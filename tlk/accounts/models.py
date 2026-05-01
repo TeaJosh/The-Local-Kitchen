@@ -125,9 +125,16 @@ class OrderItem(models.Model):
 # BLOG
 class BlogPost(models.Model):
     SECTION_CHOICES = [
+        ('local spotlight', 'Local Spotlight'),
         ('guides', 'Guides'),
         ('reviews', 'Reviews'),
-        ('news', 'News'),
+        ('no preference', 'No Preference'),
+    ]
+
+    VIBE_CHOICES = [
+        ('cozy', 'Cozy'),
+        ('lively', 'Lively'),
+        ('modern', 'Modern'),
     ]
 
     OCCASION_CHOICES = [
@@ -177,8 +184,9 @@ class BlogPost(models.Model):
     image = models.URLField(max_length=500, blank=True, null=True, default='')
     content = models.TextField()
 
-    section = models.CharField(max_length=50, choices=SECTION_CHOICES, default='guides', blank=True)
+    section = models.CharField(max_length=50, choices=SECTION_CHOICES, default='guides')
     cuisine = models.CharField(max_length=50, choices=CUISINE_CHOICES, default='all', blank=True)
+    vibe = models.CharField(max_length=50, choices=VIBE_CHOICES, default='cozy', blank=True)
     occasion = models.CharField(max_length=50, choices=OCCASION_CHOICES, default='all', blank=True)
 
     city = models.CharField(max_length=100, blank=True)
@@ -193,8 +201,23 @@ class BlogPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    view_count = models.PositiveIntegerField(default=0)
+    is_editors_pick = models.BooleanField(default=False)
+
     def __str__(self):
         return self.title
+    
+class BlogPostView(models.Model):
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='views')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('post', 'user') #one view per user per post
+
+    def __str__(self):
+        return f"{self.user.username} viewed {self.post.title}"
+
         
 class Comment(models.Model):
     post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)

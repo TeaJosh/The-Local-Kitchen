@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import token_required
-from .models import CustomUser, Restaurant, BlogPost, AuthToken, Comment
+from .models import CustomUser, Restaurant, BlogPost, AuthToken, Comment, BlogPostView
 import json
 
 
@@ -110,6 +110,77 @@ def logout_view(request):
     logout(request)
     return JsonResponse({'message': 'Logged out successfully'})
 
+#Account management views
+@csrf_exempt
+@token_required
+def me(request):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    user = request.user
+    return JsonResponse({
+        'username': user.username,
+        'email': user.email,
+        'date_joined': str(user.date_joined),
+    })
+
+
+@csrf_exempt
+@token_required
+def change_email(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    data = json.loads(request.body)
+    new_email = data.get('new_email')
+    current_password = data.get('current_password')
+
+    if not new_email or not current_password:
+        return JsonResponse({'error': 'Email and password are required'}, status=400)
+
+    user = authenticate(request, username=request.user.email, password=current_password)
+    if user is None:
+        return JsonResponse({'error': 'Password is incorrect'}, status=400)
+
+    if CustomUser.objects.filter(email=new_email).exclude(pk=request.user.pk).exists():
+        return JsonResponse({'error': 'Email already in use'}, status=400)
+
+    request.user.email = new_email
+    request.user.save()
+    return JsonResponse({'message': 'Email updated successfully'})
+
+
+@csrf_exempt
+@token_required
+def change_password(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    data = json.loads(request.body)
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    if not current_password or not new_password:
+        return JsonResponse({'error': 'Both current and new password are required'}, status=400)
+
+    user = authenticate(request, username=request.user.email, password=current_password)
+    if user is None:
+        return JsonResponse({'error': 'Current password is incorrect'}, status=400)
+
+    request.user.set_password(new_password)
+    request.user.save()
+    return JsonResponse({'message': 'Password updated successfully'})
+
+
+@csrf_exempt
+@token_required
+def delete_account(request):
+    if request.method != 'DELETE':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    request.user.delete()
+    return JsonResponse({'message': 'Account deleted successfully'})
+
 
 @csrf_exempt
 @token_required
@@ -130,6 +201,7 @@ def create_blog_post(request):
             image=data.get('image', ''),
             content=data['content'],
             section=data.get('section', 'guides'),
+            vibe=data.get('vibe', 'cozy').lower(),
             cuisine=data.get('cuisine', 'all'),
             occasion=data.get('occasion', 'all'),
             city=data.get('city', ''),
@@ -172,6 +244,13 @@ def blog_post_detail(request, post_id):
         try:
             post = BlogPost.objects.get(id=post_id, is_published=True)
 
+            #tracking view count for registered users, but not for anonymous users
+            if request.user.is_authenticated:
+                _, created = BlogPostView.objects.get_or_create(post=post, user=request.user)
+                if created:
+                    post.view_count += 1
+                    post.save(update_fields=['view_count'])
+
             author_name = "Anonymous" if post.is_anonymous else post.author.username
 
             comments_data = []
@@ -194,11 +273,14 @@ def blog_post_detail(request, post_id):
                     'content': post.content,
                     'section': post.section,
                     'cuisine': post.cuisine,
+                    'vibe': post.vibe,
                     'occasion': post.occasion,
                     'author': author_name,
                     'city': post.city,
                     'state': post.state,
                     'allow_comments': post.allow_comments,
+                    'is_editors_pick': post.is_editors_pick,
+                    'view_count': post.view_count,
                     'comments': comments_data,
                     'created_at': str(post.created_at),
                     'updated_at': str(post.updated_at),
@@ -217,6 +299,7 @@ def list_blog_posts(request):
         posts = BlogPost.objects.filter(is_published=True)
 
         section = request.GET.get('section')
+        vibe = request.GET.get('vibe')
         cuisine = request.GET.get('cuisine')
         occasion = request.GET.get('occasion')
         sort = request.GET.get('sort', 'recent')
@@ -230,6 +313,22 @@ def list_blog_posts(request):
         if sort == 'recent':
             posts = posts.order_by('-created_at')
 
+    #trending criteria, 40% or more of members have viewed it, and order by view percentage
+    if sort == 'trending':
+        from django.db.models import Count, F, FloatField, ExpressionWrapper
+    
+        total_members = CustomUser.objects.filter(role=CustomUser.MEMBER).count()
+    
+        if total_members > 0:
+            posts = posts.annotate(
+                view_percentage=ExpressionWrapper(F('view_count') * 100.0 / total_members,output_field=FloatField())
+        ).filter(view_percentage__gte=40).order_by('-view_percentage') # 40% or more of members have viewed it
+        else:
+            posts = posts.none()
+    else:
+        posts = posts.order_by('-created_at')
+
+
         data = [
             {
                 'id': p.id,
@@ -238,10 +337,13 @@ def list_blog_posts(request):
                 'image': p.image,
                 'section': p.section,
                 'cuisine': p.cuisine,
+                'vibe': p.vibe,
                 'occasion': p.occasion,
                 'author': "Anonymous" if p.is_anonymous else p.author.username,
                 'city': p.city,
                 'state': p.state,
+                'is_editors_pick': p.is_editors_pick,
+                'view_count': p.view_count,
                 'created_at': str(p.created_at),
             }
             for p in posts
