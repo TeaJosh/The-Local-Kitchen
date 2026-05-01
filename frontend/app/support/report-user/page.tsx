@@ -27,7 +27,7 @@ export default function ReportUser() {
 
     // Send the collected form data as JSON to the support report endpoint
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/support/report/`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/support/report-user/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(object),
