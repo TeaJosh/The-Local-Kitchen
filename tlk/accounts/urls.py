@@ -16,13 +16,17 @@ urlpatterns = [
     path('api/posts/<int:post_id>/comments/', views.add_comment, name='add_comment'),
     path('api/comments/<int:comment_id>/', views.delete_comment, name='delete_comment'),
 
-    #Account Management views
+    # Account Management views
     path('api/accounts/me/', views.me, name='me'),
     path('api/accounts/change_email/', views.change_email, name='change_email'),
     path('api/accounts/change_password/', views.change_password, name='change_password'),
     path('api/accounts/delete/', views.delete_account, name='delete_account'),
 
-    #Report and Contact URLs
+    # Report and Contact URLs
     path('api/support/report-user/', views.report_user, name='report_user'),
     path('api/contact/', views.contact_submit, name='contact_submit'),
+
+    # Blog Comment URLs
+    path('api/posts/<int:post_id>/comments/', views.add_comment, name='add_comment'),
+    path('api/comments/<int:comment_id>/', views.delete_comment, name='delete_comment'),
 ]
