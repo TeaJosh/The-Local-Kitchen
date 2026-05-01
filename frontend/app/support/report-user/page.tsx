@@ -12,7 +12,8 @@ export default function ReportUser() {
    */
   const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const user = localStorage.getItem("user");
 
     // If user is logged in, use their username as reporter, otherwise mark as "Anonymous"
@@ -36,7 +37,7 @@ export default function ReportUser() {
       alert("Report submitted successfully!");
 
       // Reset the form after successful submission
-      e.currentTarget.reset();
+      form.reset();
     } catch (err) {
       console.error(err);
       alert("Failed to submit report. Please try again later.");

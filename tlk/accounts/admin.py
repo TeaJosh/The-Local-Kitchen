@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Restaurant, MenuItem, PickupWindow, Order, OrderItem, BlogPost, Comment, BlogPostView
+from .models import CustomUser, Restaurant, MenuItem, PickupWindow, Order, OrderItem, BlogPost, Comment, BlogPostView, ContactMessage, UserReport
 
 admin.site.register(CustomUser)
 admin.site.register(Restaurant)
@@ -17,3 +17,5 @@ class BlogPostAdmin(admin.ModelAdmin):
     list_editable = ('is_editors_pick',)  # Toggle right from the list page
 
 admin.site.register(BlogPost, BlogPostAdmin)
+admin.site.register(ContactMessage)
+admin.site.register(UserReport)

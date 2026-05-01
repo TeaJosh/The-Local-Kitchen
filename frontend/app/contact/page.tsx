@@ -35,6 +35,7 @@ export default function Contact() {
    */
   const onSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
 
     // Check if user has entered a phone number and if it's valid before submitting
     if (phoneTouched && formData.phoneNumber.length > 0 && !phoneValid) {
@@ -42,7 +43,7 @@ export default function Contact() {
       return;
     }
 
-    const submittedData = new FormData(e.currentTarget);
+    const submittedData = new FormData(form);
     const user = localStorage.getItem("user");
 
     // If user is logged in, use their username as reporter, otherwise mark as "Anonymous"
@@ -65,7 +66,7 @@ export default function Contact() {
       alert("Form submitted successfully!");
 
       // Reset the form after successful submission
-      e.currentTarget.reset();
+      form.reset();
 
       setFormData({ phoneNumber: "" });
       setPhoneTouched(false);
