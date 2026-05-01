@@ -48,7 +48,7 @@ export default function AccountPage() {
 
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/accounts/me/`, {
             headers: {
-                Authorization: `Token ${token}`
+                Authorization: `Bearer ${token}`
             }
         })
             .then(async (res) => {
@@ -102,7 +102,7 @@ export default function AccountPage() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Token ${token}`
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     new_email: newEmail,
@@ -138,7 +138,7 @@ export default function AccountPage() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Token ${token}`
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify({
                     current_password: currentPassword,
@@ -161,7 +161,7 @@ export default function AccountPage() {
             const token = localStorage.getItem("token");
             await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/accounts/delete/`, {
                 method: "DELETE",
-                headers: { "Authorization": `Token ${token}` },
+                headers: { "Authorization": `Bearer ${token}` },
             });
 
             localStorage.removeItem("token");
