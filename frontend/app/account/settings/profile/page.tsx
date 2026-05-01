@@ -1,70 +1,258 @@
 "use client";
+
 import Link from "next/link";
-import { FaUserCog, FaUser, FaLock, FaEnvelope, FaAddressBook, FaCreditCard, FaHistory, FaBookmark } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
-export default function Sidebar() {
-    return (
-        <aside className="flex flex-col w-64 h-screen px-4 py-8 overflow-y-auto bg-white border-r rtl:border-r-0 rtl:border-l dark:bg-gray-900 dark:border-gray-700">
-            <div className="flex flex-col justify-between flex-1 mt-6">
-                <nav className="flex flex-col gap-1">
+type Profile = {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  bio?: string;
+  city?: string;
+  state?: string;
+  image?: string | null;
+};
 
-                    <Link href="/account/settings/account" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaUserCog />
-                            Account
-                        </span>
+export default function ProfilePage() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<"home" | "about" | "activity">("home");
+
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+
+  // ================= PROFILE =================
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token || token === "undefined" || token === "null") {
+          setLoading(false);
+          return;
+        }
+
+        if (!baseUrl) {
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`${baseUrl}/api/accounts/profile/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        const data = await res.json();
+        setProfile(data.profile ?? data);
+      } catch (err) {
+        console.error(err);
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [baseUrl]);
+
+  // ================= POSTS =================
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        if (!baseUrl) return;
+
+        const res = await fetch(`${baseUrl}/api/posts/`, {
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+        });
+
+        const data = await res.json();
+
+        const normalized = Array.isArray(data)
+          ? data
+          : data?.results || data?.posts || [];
+
+        setPosts(normalized);
+      } catch (err) {
+        console.error(err);
+        setPosts([]);
+      }
+    };
+
+    loadPosts();
+  }, [baseUrl]);
+
+  // ================= IMAGE (FIXED CLEAN LOGIC) =================
+  const localImage =
+    typeof window !== "undefined"
+      ? localStorage.getItem("profile_image")
+      : null;
+
+  const profileImage =
+    localImage ||
+    (profile?.image
+      ? profile.image.startsWith("http")
+        ? profile.image
+        : `${baseUrl}${profile.image}`
+      : "https://i.pravatar.cc/150");
+
+  // ================= LOADING =================
+  if (loading) return <div className="p-8">Loading...</div>;
+  if (!profile) return <div className="p-8">Failed to load profile</div>;
+
+  const fullName =
+    `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
+    profile.username;
+
+  // ================= POST IMAGE =================
+  const getPostImage = (post: any) => {
+    const img = post.image;
+    if (!img) return null;
+
+    if (img.startsWith("http") || img.startsWith("data:image")) return img;
+
+    if (!baseUrl) return img;
+
+    return `${baseUrl}${img.startsWith("/") ? img : `/${img}`}`;
+  };
+
+  return (
+    <div className="bg-gray-50 min-h-screen flex justify-center">
+      <div className="w-full max-w-7xl p-10 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-14">
+        {/* ================= LEFT ================= */}
+        <div className="space-y-10">
+          <h1 className="text-3xl font-bold">{fullName}</h1>
+
+          {/* TABS */}
+          <div className="flex gap-6 text-sm">
+            {["home", "about", "activity"].map((t) => (
+              <button
+                key={t}
+                onClick={() => setTab(t as any)}
+                className={`pb-3 capitalize transition ${
+                  tab === t
+                    ? "border-b-2 border-black font-semibold"
+                    : "text-gray-500 hover:text-black"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          {/* HOME */}
+          {tab === "home" && (
+            <div className="space-y-10 max-w-3xl mx-auto">
+              {posts.length === 0 ? (
+                <p className="text-gray-500">No posts yet.</p>
+              ) : (
+                posts.map((post) => {
+                  const image = getPostImage(post);
+
+                  const author =
+                    post.author_name || post.username || profile.username;
+
+                  return (
+                    <Link
+                      key={post.id}
+                      href={`/posts/${post.id}`}
+                      className="block bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-[1.01] transition"
+                    >
+                      {image && (
+                        <img
+                          src={image}
+                          className="w-full h-72 object-cover"
+                          alt="post"
+                        />
+                      )}
+
+                      <div className="p-7 space-y-5">
+                        <div className="flex gap-2 flex-wrap">
+                          <span className="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+                            {post.section}
+                          </span>
+                          <span className="px-3 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
+                            {post.cuisine}
+                          </span>
+                          <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-700">
+                            {post.occasion}
+                          </span>
+                        </div>
+
+                        <h2 className="text-2xl font-bold">
+                          {post.title || "Untitled"}
+                        </h2>
+
+                        <p className="text-sm text-gray-500">
+                          {post.city}, {post.state}
+                        </p>
+
+                        <p className="text-gray-600">{post.subheading}</p>
+
+                        <div className="flex justify-between text-sm text-gray-500">
+                          <span>By {author}</span>
+                          <span>
+                            {new Date(post.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
                     </Link>
-
-                    <Link href="/account/settings/profile" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaUser />
-                            Profile
-                        </span>
-                    </Link>
-
-                    <Link href="/account/settings/privacy" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaLock />
-                            Privacy
-                        </span>
-                    </Link>
-
-                    <Link href="/account/settings/notifications" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaEnvelope />
-                            Notifications
-                        </span>
-                    </Link>
-
-                    <Link href="/account/settings/address" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaAddressBook />
-                            Address
-                        </span>
-                    </Link>
-
-                    <Link href="/account/settings/payment-methods" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaCreditCard />
-                            Payment Methods
-                        </span>
-                    </Link>
-
-                    <Link href="/account/settings/order-history" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaHistory />
-                            Order History
-                        </span>
-                    </Link>
-
-                    <Link href="/account/settings/saved-posts" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                        <span className="mx-4 font-medium flex items-center gap-2">
-                            <FaBookmark />
-                            Saved Posts
-                        </span>
-                    </Link>
-                </nav>
+                  );
+                })
+              )}
             </div>
+          )}
+
+          {/* ABOUT */}
+          {tab === "about" && (
+            <div className="bg-white p-6 rounded-2xl shadow-sm max-w-3xl mx-auto">
+              <p>{profile.bio || "—"}</p>
+            </div>
+          )}
+
+          {/* ACTIVITY */}
+          {tab === "activity" && (
+            <div className="text-gray-500">User activity will appear here.</div>
+          )}
+        </div>
+
+        {/* ================= RIGHT ================= */}
+        <aside>
+          <div className="bg-white rounded-2xl shadow-sm p-6 text-center space-y-4 sticky top-10">
+            <img
+              src={profileImage}
+              className="w-24 h-24 rounded-full object-cover border mx-auto"
+              alt={profile.username}
+            />
+
+            <div className="text-sm text-gray-600 space-y-1 text-left">
+              <p>
+                <b>User Name:</b> {profile.username}
+              </p>
+              <p>
+                <b>Name:</b> {fullName}
+              </p>
+              <p>
+                <b>Email:</b> {profile.email}
+              </p>
+              <p className=" overflow-y-auto">
+                <b>Bio:</b> {profile.bio || "—"}
+              </p>
+            </div>
+
+            <Link
+              href="/account/settings/profile/edit-profile"
+              className="bg-black text-white px-5 py-2 rounded-lg hover:opacity-80 transition inline-block"
+            >
+              Edit Profile
+            </Link>
+          </div>
         </aside>
-    );
+      </div>
+    </div>
+  );
 }
