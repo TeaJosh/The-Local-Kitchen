@@ -88,7 +88,7 @@ export default function Comments({
 
     try {
       const res = await fetch(
-        `${baseUrl}/api/posts/${postId}/comments/create/`,
+        `${baseUrl}/api/posts/${postId}/comments/`,
         {
           method: "POST",
           headers: {
