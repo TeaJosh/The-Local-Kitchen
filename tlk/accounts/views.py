@@ -197,15 +197,15 @@ def create_blog_post(request):
         post = BlogPost.objects.create(
             author=request.user,
             title=data['title'],
-            subheading=data.get('subheading', ''),
-            image=data.get('image', ''),
+            subheading=data.get('subheading') or '',
+            image=data.get('image') or '',
             content=data['content'],
-            section=data.get('section', 'guides'),
-            vibe=data.get('vibe', 'cozy').lower(),
-            cuisine=data.get('cuisine', 'all'),
-            occasion=data.get('occasion', 'all'),
-            city=data.get('city', ''),
-            state=data.get('state', ''),
+            section=data.get('section') or 'guides',
+            vibe=(data.get('vibe') or 'cozy').lower(),
+            cuisine=data.get('cuisine') or 'all',
+            occasion=data.get('occasion') or 'all',
+            city=data.get('city') or '',
+            state=data.get('state') or '',
             allow_comments=data.get('allow_comments', True),
             is_anonymous=data.get('is_anonymous', False),
             is_draft=False,
@@ -355,35 +355,59 @@ def list_blog_posts(request):
 
 
 @csrf_exempt
-@token_required
-def add_comment(request, post_id):
+def post_comments(request, post_id):
+    try:
+        post = BlogPost.objects.get(id=post_id, is_published=True)
+    except BlogPost.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    # ---- LIST (public) ----
+    if request.method == 'GET':
+        comments = Comment.objects.filter(post=post).order_by('-created_at')
+        return JsonResponse({
+            'comments': [
+                {
+                    'id': c.id,
+                    'author': c.author.username,
+                    'content': c.content,
+                    'created_at': c.created_at.isoformat(),
+                }
+                for c in comments
+            ]
+        })
+
+    # ---- CREATE (auth required) ----
     if request.method == 'POST':
-        if request.user.role != CustomUser.MEMBER:
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return JsonResponse({'error': 'Authorization required'}, status=401)
+
+        token_key = auth_header.split(' ')[1]
+        try:
+            token = AuthToken.objects.get(key=token_key)
+            user = token.user
+        except AuthToken.DoesNotExist:
+            return JsonResponse({'error': 'Invalid or expired token'}, status=401)
+
+        if user.role != CustomUser.MEMBER:
             return JsonResponse({'error': 'Must be a Member'}, status=403)
 
-        if request.user.is_banned:
+        if user.is_banned:
             return JsonResponse({'error': 'Banned'}, status=403)
-
-        try:
-            post = BlogPost.objects.get(id=post_id, is_published=True)
-        except BlogPost.DoesNotExist:
-            return JsonResponse({'error': 'Not found'}, status=404)
 
         if not post.allow_comments:
             return JsonResponse({'error': 'Comments disabled'}, status=403)
 
         data = json.loads(request.body)
-
         comment = Comment.objects.create(
             post=post,
-            author=request.user,
+            author=user,
             content=data['content']
         )
 
         return JsonResponse({'message': 'Comment added', 'comment_id': comment.id})
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
-
 
 @csrf_exempt
 @token_required
@@ -442,3 +466,57 @@ def report_user(request):
 
     return JsonResponse({'message': 'Report submitted successfully'})
 
+# Profile Page Views
+@csrf_exempt
+@token_required
+def get_profile(request):
+    if request.method != "GET":
+        return JsonResponse({"error": "Invalid request method"}, status=400)
+
+    user = request.user
+
+    return JsonResponse({
+        "profile": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "phone_number": getattr(user, "phone_number", ""),
+            "bio": getattr(user, "bio", ""),
+            "city": getattr(user, "city", ""),
+            "state": getattr(user, "state", ""),
+            "role": user.role,
+            "image": request.build_absolute_uri(user.profile_picture.url)
+                if getattr(user, "profile_picture", None) else None,
+        }
+    })
+
+
+@csrf_exempt
+@token_required
+def update_profile(request):
+    if request.method not in ["PUT", "PATCH", "POST"]:
+        return JsonResponse({"error": "Invalid request method"}, status=400)
+
+    user = request.user
+
+    data = request.POST  # works for FormData
+    files = request.FILES
+
+    user.username = data.get("username", user.username)
+    user.email = data.get("email", user.email)
+    user.first_name = data.get("first_name", user.first_name)
+    user.last_name = data.get("last_name", user.last_name)
+    user.phone_number = data.get("phone_number", getattr(user, "phone_number", ""))
+    user.bio = data.get("bio", getattr(user, "bio", ""))
+    user.city = data.get("city", getattr(user, "city", ""))
+    user.state = data.get("state", getattr(user, "state", ""))
+
+    # ✅ IMAGE FIX
+    if "profile_picture" in files:
+        user.profile_picture = files["profile_picture"]
+
+    user.save()
+
+    return JsonResponse({"message": "Profile updated successfully"})

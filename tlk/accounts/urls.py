@@ -13,7 +13,9 @@ urlpatterns = [
     path('api/posts/create/', views.create_blog_post, name='create_post'),
     path('api/posts/<int:post_id>/', views.blog_post_detail, name='post_detail'),
     path('api/posts/<int:post_id>/delete/', views.delete_blog_post, name='delete_post'),
-    path('api/posts/<int:post_id>/comments/', views.add_comment, name='add_comment'),
+
+    # Blog Comment URLs
+    path('api/posts/<int:post_id>/comments/', views.post_comments, name='post_comments'),
     path('api/comments/<int:comment_id>/', views.delete_comment, name='delete_comment'),
 
     # Account Management views
@@ -26,7 +28,7 @@ urlpatterns = [
     path('api/support/report-user/', views.report_user, name='report_user'),
     path('api/contact/', views.contact_submit, name='contact_submit'),
 
-    # Blog Comment URLs
-    path('api/posts/<int:post_id>/comments/', views.add_comment, name='add_comment'),
-    path('api/comments/<int:comment_id>/', views.delete_comment, name='delete_comment'),
+    # Profile Page Urls
+    path('api/accounts/profile/', views.get_profile, name='get_profile'),
+    path('api/accounts/profile/update/', views.update_profile, name='update_profile'),
 ]

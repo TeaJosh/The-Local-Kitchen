@@ -228,7 +228,7 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.author.user.username} on {self.post.title}"
     
-#Report User or Content
+#Report User/Content
 class UserReport(models.Model):
     reporter = models.CharField(max_length=100, default='Anonymous')
     subject = models.CharField(max_length=100)
@@ -241,7 +241,8 @@ class UserReport(models.Model):
 
     def __str__(self):
         return f"Report: {self.reported_user} — {self.subject}"
-    
+
+
 #Contact Page Model
 class ContactMessage(models.Model):
     reporter = models.CharField(max_length=100, default='Anonymous')
