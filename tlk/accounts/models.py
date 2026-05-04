@@ -228,7 +228,7 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.author.user.username} on {self.post.title}"
     
-#Report User/Content
+#Report User or Content
 class UserReport(models.Model):
     reporter = models.CharField(max_length=100, default='Anonymous')
     subject = models.CharField(max_length=100)
