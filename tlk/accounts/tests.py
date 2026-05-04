@@ -249,13 +249,13 @@ class BlogPostTests(TestCase):
         data = res.json()['post']
         self.assertEqual(data['title'], 'Detail Post')
         self.assertEqual(data['city'], 'Minneapolis')
-        self.assertEqual(data['author'], 'blogger')
+        self.assertEqual(data['author']['username'], 'blogger')
  
     def test_blog_post_detail_anonymous(self):
         post = self._create_post(is_anonymous=True)
         res = self.client.get(f'/api/posts/{post.id}/')
         data = res.json()['post']
-        self.assertEqual(data['author'], 'Anonymous')
+        self.assertEqual(data['author']['username'], 'Anonymous')
  
     def test_blog_post_detail_not_found(self):
         res = self.client.get('/api/posts/9999/')
