@@ -5,10 +5,11 @@ import Image from "next/image"
 import type { Editor } from "@tiptap/react";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useNsfwCheck } from "@/hooks/use-nsfw-check";
 import { FaXmark } from "react-icons/fa6";
 import { IconContext } from "react-icons/lib";
+
 
 const CUISINES = [
     "American", "Bar", "Italian", "Asian", "Pub", "Pizza", "Japanese",
@@ -85,6 +86,8 @@ export default function CreatePost() {
     // Cuisines modal
     const [cuisineOpen, setCuisineOpen] = useState(false);
     const [cuisineSearch, setCuisineSearch] = useState("");
+    //draft handling
+    const [currentDraftId, setCurrentDraftId] = useState<string | null>(null);
 
     // Use a ref instead of state to avoid the race condition where
     // setIsDraft(true) hasn't updated by the time handleSubmit fires
@@ -92,6 +95,33 @@ export default function CreatePost() {
     const formRef = useRef<HTMLFormElement>(null);
 
     const router = useRouter();
+    const searchParams = useSearchParams();
+    
+
+    useEffect(() => {
+            const draftId = searchParams.get("draft");
+            if (!draftId) return;
+
+            const drafts = JSON.parse(localStorage.getItem("drafts") || "[]");
+            const draft = drafts.find((d: any) => d.id === draftId);
+            if (!draft) return;
+
+            setCurrentDraftId(draft.id);
+
+            setTitle(draft.title || "");
+            setHeading(draft.heading || "");
+            setCity(draft.city || "");
+            setState(draft.state || "");
+            setImgSrc(draft.image || null);
+            setSelectedCuisine(draft.cuisine || null);
+            setSelectedOccasion(draft.occasion || null);
+            setSelectedVibe(draft.vibe || null);
+            setSelectedSection(draft.section || null);
+
+            if (editor && draft.content) {
+                editor.commands.setContent(draft.content);
+            }
+        }, [searchParams, editor]);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -184,6 +214,14 @@ export default function CreatePost() {
             });
             if (!res.ok) throw new Error("Failed to save");
             const post = await res.json();
+
+            // Remove draft from localStorage if this was a saved draft
+            if (currentDraftId) {
+                const existing = JSON.parse(localStorage.getItem("drafts") || "[]");
+                const filtered = existing.filter((d: any) => d.id !== currentDraftId);
+                localStorage.setItem("drafts", JSON.stringify(filtered));
+            }
+
             router.push(`/posts/${post.id}`);
         } catch (error) {
             alert("Failed to save post");
@@ -547,7 +585,37 @@ export default function CreatePost() {
                         <button
                             type="button"
                             disabled={saving}
-                            onClick={() => { isDraftRef.current = true; formRef.current?.requestSubmit(); }}
+                            onClick={() => {
+                                isDraftRef.current = true;
+                                if (!title.trim() && !editor?.getText()) {
+                                    alert("Nothing to save");
+                                    return;
+                                }
+                                const draftId = currentDraftId || crypto.randomUUID();
+                                const draft = {
+                                    id: draftId,
+                                    title,
+                                    heading,
+                                    city,
+                                    state,
+                                    image: imgSrc,
+                                    content: editor ? editor.getHTML() : "",
+                                    cuisine: selectedCuisine,
+                                    occasion: selectedOccasion,
+                                    vibe: selectedVibe,
+                                    section: selectedSection,
+                                    savedAt: new Date().toISOString(),
+                                };
+                                const existing = JSON.parse(
+                                    localStorage.getItem("drafts") || "[]",
+                                );
+                                const filtered = existing.filter((d: any) => d.id !== draftId);
+                                localStorage.setItem(
+                                    "drafts",
+                                    JSON.stringify([...filtered, draft]),
+                                );
+                                router.push("/account/settings/saved-posts");
+                            }}
                             className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {saving && isDraftRef.current ? "Saving..." : "Save Draft"}

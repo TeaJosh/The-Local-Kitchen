@@ -1,4 +1,5 @@
 import Comments from "@/components/Comments";
+import DeletePostButton from "@/components/DeletePostButton";
 
 /**
  * Fetches a single post by ID from the backend API.
@@ -76,6 +77,10 @@ export default async function Page({
         <p className="text-gray-500 text-center mt-3 text-sm">
           {new Date(post.created_at).toLocaleDateString()}
         </p>
+        {/* DELETE (only visible to the author) */}
+        <div className="flex justify-center mt-2">
+          <DeletePostButton postId={post.id} authorUsername={typeof post.author === "string" ? post.author : post.author?.username || ""} />
+        </div>
 
         {/* ===================== */}
         {/* HEADING */}

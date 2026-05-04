@@ -32,11 +32,12 @@ export function ThemeToggle() {
   const toggleDarkMode = () => setIsDarkMode((isDark) => !isDark)
 
   return (
-    <Button
-      onClick={toggleDarkMode}
-      aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
-      variant="ghost"
-    >
+      <Button
+        type="button"
+        onClick={toggleDarkMode}
+        aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
+        variant="ghost"
+      >
       {isDarkMode ? (
         <MoonStarIcon className="tiptap-button-icon" />
       ) : (
