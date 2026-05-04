@@ -222,7 +222,7 @@ export default function CreatePost() {
                 localStorage.setItem("drafts", JSON.stringify(filtered));
             }
 
-            router.push(`/posts/${post.id}`);
+            router.push(`/posts/${post.post_id}`);
         } catch (error) {
             alert("Failed to save post");
         } finally {
