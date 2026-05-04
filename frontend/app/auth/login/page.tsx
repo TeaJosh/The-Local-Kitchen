@@ -55,11 +55,9 @@ export default function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify({
-        username: data.username,
-        email: data.email,
-        profilePicture: data.pfp,
+          username: data.username,
+          pfp: data.profile_picture,
       }));
-
       router.push("/");
     } catch {
       setError("Unable to connect to the server. Please try again.");

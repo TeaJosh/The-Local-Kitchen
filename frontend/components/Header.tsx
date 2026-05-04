@@ -34,10 +34,11 @@ export default function Header() {
   }, []);
 
   function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    router.push("/");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("profile_image");
+      setUser(null);
+      router.push("/");
   }
 
   return (

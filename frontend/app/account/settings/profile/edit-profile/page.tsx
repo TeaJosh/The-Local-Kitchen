@@ -44,7 +44,7 @@ export default function EditProfilePage() {
   // VALIDATION
   // =========================
   const phoneValid = phone.trim() === "" || /^[+]?[\d\s-]{10,16}$/.test(phone);
-  const bioValid = bio.length >= 20 && bio.length <= 250;
+  const bioValid = bio.length === 0 || (bio.length >= 20 && bio.length <= 250);
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -119,7 +119,7 @@ export default function EditProfilePage() {
   // =========================
   // SAVE
   // =========================
-  const handleSave = async (e: React.FormEvent) => {
+const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const token = localStorage.getItem("token");
@@ -157,7 +157,18 @@ export default function EditProfilePage() {
 
       if (!res.ok) throw new Error("Update failed");
 
-      router.push("/account/settings/profile");
+      // Update localStorage so header reflects changes
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const userData = JSON.parse(stored);
+        if (profilePic) {
+          userData.pfp = preview;
+        }
+        userData.username = username;
+        localStorage.setItem("user", JSON.stringify(userData));
+      }
+
+      window.location.href = "/account/settings/profile";
     } catch (err) {
       console.error(err);
       alert("Failed to update");
