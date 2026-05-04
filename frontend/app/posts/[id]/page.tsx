@@ -110,7 +110,7 @@ export default async function Page({
           Uses allow_comments field from Django API response
         */}
         {post.allow_comments !== false && (
-          <Comments postId={post.id} currentUser={post.currentUser ?? null} />
+          <Comments postId={post.id} />
         )}
       </div>
     </div>

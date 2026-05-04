@@ -147,7 +147,7 @@ export default function EditProfilePage() {
       formData.append("state", regionState);
       formData.append("zip", zip);
 
-      if (profilePic) formData.append("image", profilePic);
+      if (profilePic) formData.append("profile_picture", profilePic);
 
       const res = await fetch(`${baseUrl}/api/accounts/profile/update/`, {
         method: "POST",
