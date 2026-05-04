@@ -275,7 +275,11 @@ def blog_post_detail(request, post_id):
                     'cuisine': post.cuisine,
                     'vibe': post.vibe,
                     'occasion': post.occasion,
-                    'author': author_name,
+                    'author': {
+                            'username': author_name,
+                            'image': request.build_absolute_uri(post.author.profile_picture.url)
+                                if post.author.profile_picture else None,
+                    } if not post.is_anonymous else {'username': 'Anonymous', 'image': None},
                     'city': post.city,
                     'state': post.state,
                     'allow_comments': post.allow_comments,
