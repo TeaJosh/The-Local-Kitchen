@@ -220,7 +220,7 @@ export default function Header() {
                   </li>
                   <li>
                     <Link
-                      href="/help-center"
+                      href="/support/help-center"
                       className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
                       onClick={() => setDropdownOpen(false)}
                     >
