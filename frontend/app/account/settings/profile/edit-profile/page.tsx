@@ -119,7 +119,7 @@ export default function EditProfilePage() {
   // =========================
   // SAVE
   // =========================
-const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const token = localStorage.getItem("token");
@@ -157,12 +157,18 @@ const handleSave = async (e: React.FormEvent) => {
 
       if (!res.ok) throw new Error("Update failed");
 
-      // Update localStorage so header reflects changes
+      // Fetch updated profile to get the server image URL
+      const profileRes = await fetch(`${baseUrl}/api/accounts/profile/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const profileData = await profileRes.json();
+      const p = profileData.profile;
+
       const stored = localStorage.getItem("user");
       if (stored) {
         const userData = JSON.parse(stored);
-        if (profilePic) {
-          userData.pfp = preview;
+        if (p.image) {
+          userData.pfp = p.image.startsWith("http") ? p.image : `${baseUrl}${p.image}`;
         }
         userData.username = username;
         localStorage.setItem("user", JSON.stringify(userData));
@@ -314,9 +320,8 @@ const handleSave = async (e: React.FormEvent) => {
                   setPhone(e.target.value);
                   setPhoneTouched(true);
                 }}
-                className={`w-full border p-3 rounded ${
-                  phoneTouched && !phoneValid ? "border-red-500" : ""
-                }`}
+                className={`w-full border p-3 rounded ${phoneTouched && !phoneValid ? "border-red-500" : ""
+                  }`}
               />
               {phoneTouched && !phoneValid && (
                 <p className="text-xs text-red-500">
@@ -342,9 +347,8 @@ const handleSave = async (e: React.FormEvent) => {
             <div>
               <label className="text-sm font-medium">Bio</label>
               <textarea
-                className={`w-full border p-3 rounded min-h-[120px] ${
-                  bio.length > 0 && !bioValid ? "border-red-500" : ""
-                }`}
+                className={`w-full border p-3 rounded min-h-[120px] ${bio.length > 0 && !bioValid ? "border-red-500" : ""
+                  }`}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
               />

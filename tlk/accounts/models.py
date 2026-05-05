@@ -232,7 +232,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.author.user.username} on {self.post.title}"
+        return f"{self.author.username} on {self.post.title}"
     
 #Report User or Content
 class UserReport(models.Model):

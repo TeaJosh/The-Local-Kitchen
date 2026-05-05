@@ -26,7 +26,8 @@ export default function SavedPostsPage() {
   const [drafts, setDrafts] = useState<Draft[]>([]);
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("drafts") || "[]");
+    const username = JSON.parse(localStorage.getItem("user") || "{}").username;
+    const data = JSON.parse(localStorage.getItem(`drafts_${ username }`) || "[]");
     setDrafts(data);
   }, []);
 
@@ -104,12 +105,14 @@ export default function SavedPostsPage() {
                       if (!window.confirm("Delete this draft?")) return;
                       const updated = drafts.filter((x) => x.id !== d.id);
                       setDrafts(updated);
-                      localStorage.setItem("drafts", JSON.stringify(updated));
+                      const username = JSON.parse(localStorage.getItem("user") || "{}").username;
+                      localStorage.setItem(`drafts_${ username }`, JSON.stringify(updated));
                     }}
                     className="text-gray-400 hover:text-red-500 text-xl self-center px-2"
                   >
                     ×
                   </button>
+
                 </div>
               ))}
             </div>

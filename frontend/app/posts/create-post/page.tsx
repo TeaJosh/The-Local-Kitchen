@@ -96,32 +96,34 @@ export default function CreatePost() {
 
     const router = useRouter();
     const searchParams = useSearchParams();
-    
+
 
     useEffect(() => {
-            const draftId = searchParams.get("draft");
-            if (!draftId) return;
+        const draftId = searchParams.get("draft");
+        if (!draftId) return;
 
-            const drafts = JSON.parse(localStorage.getItem("drafts") || "[]");
-            const draft = drafts.find((d: any) => d.id === draftId);
-            if (!draft) return;
+        const username = JSON.parse(localStorage.getItem("user") || "{}").username;
+        const drafts = JSON.parse(localStorage.getItem(`drafts_${username}`) || "[]");
+        const draft = drafts.find((d: any) => d.id === draftId);
+        
+        if (!draft) return;
 
-            setCurrentDraftId(draft.id);
+        setCurrentDraftId(draft.id);
 
-            setTitle(draft.title || "");
-            setHeading(draft.heading || "");
-            setCity(draft.city || "");
-            setState(draft.state || "");
-            setImgSrc(draft.image || null);
-            setSelectedCuisine(draft.cuisine || null);
-            setSelectedOccasion(draft.occasion || null);
-            setSelectedVibe(draft.vibe || null);
-            setSelectedSection(draft.section || null);
+        setTitle(draft.title || "");
+        setHeading(draft.heading || "");
+        setCity(draft.city || "");
+        setState(draft.state || "");
+        setImgSrc(draft.image || null);
+        setSelectedCuisine(draft.cuisine || null);
+        setSelectedOccasion(draft.occasion || null);
+        setSelectedVibe(draft.vibe || null);
+        setSelectedSection(draft.section || null);
 
-            if (editor && draft.content) {
-                editor.commands.setContent(draft.content);
-            }
-        }, [searchParams, editor]);
+        if (editor && draft.content) {
+            editor.commands.setContent(draft.content);
+        }
+    }, [searchParams, editor]);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -217,9 +219,10 @@ export default function CreatePost() {
 
             // Remove draft from localStorage if this was a saved draft
             if (currentDraftId) {
-                const existing = JSON.parse(localStorage.getItem("drafts") || "[]");
+                const username = JSON.parse(localStorage.getItem("user") || "{}").username;
+                const existing = JSON.parse(localStorage.getItem(`drafts_${username}`) || "[]");
                 const filtered = existing.filter((d: any) => d.id !== currentDraftId);
-                localStorage.setItem("drafts", JSON.stringify(filtered));
+                localStorage.setItem(`drafts_${username}`, JSON.stringify(filtered));
             }
 
             router.push(`/posts/${post.post_id}`);
@@ -606,12 +609,13 @@ export default function CreatePost() {
                                     section: selectedSection,
                                     savedAt: new Date().toISOString(),
                                 };
+                                const username = JSON.parse(localStorage.getItem("user") || "{}").username;
                                 const existing = JSON.parse(
-                                    localStorage.getItem("drafts") || "[]",
+                                    localStorage.getItem(`drafts_${username}`) || "[]",
                                 );
                                 const filtered = existing.filter((d: any) => d.id !== draftId);
                                 localStorage.setItem(
-                                    "drafts",
+                                    `drafts_${username}`,
                                     JSON.stringify([...filtered, draft]),
                                 );
                                 router.push("/account/settings/saved-posts");

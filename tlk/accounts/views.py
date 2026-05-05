@@ -271,10 +271,10 @@ def blog_post_detail(request, post_id):
                     'subheading': post.subheading,
                     'image': post.image,
                     'content': post.content,
-                    'section': post.section,
-                    'cuisine': post.cuisine,
-                    'vibe': post.vibe,
-                    'occasion': post.occasion,
+                    'cuisine': post.get_cuisine_display(),
+                    'vibe': post.get_vibe_display(),
+                    'occasion': post.get_occasion_display(),
+                    'section': post.get_section_display(),
                     'author': {
                             'username': author_name,
                             'image': request.build_absolute_uri(post.author.profile_picture.url)
