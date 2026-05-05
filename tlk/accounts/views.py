@@ -488,6 +488,9 @@ def get_profile(request):
             "last_name": user.last_name,
             "phone_number": getattr(user, "phone_number", ""),
             "bio": getattr(user, "bio", ""),
+            "address1": getattr(user, "address1", ""),
+            "address2": getattr(user, "address2", ""),
+            "zip": getattr(user, "zip_code", ""),
             "city": getattr(user, "city", ""),
             "state": getattr(user, "state", ""),
             "role": user.role,
@@ -514,6 +517,9 @@ def update_profile(request):
     user.last_name = data.get("last_name", user.last_name)
     user.phone_number = data.get("phone_number", getattr(user, "phone_number", ""))
     user.bio = data.get("bio", getattr(user, "bio", ""))
+    user.address1 = data.get("address1", getattr(user, "address1", ""))
+    user.address2 = data.get("address2", getattr(user, "address2", ""))
+    user.zip_code = data.get("zip", getattr(user, "zip_code", ""))
     user.city = data.get("city", getattr(user, "city", ""))
     user.state = data.get("state", getattr(user, "state", ""))
 
