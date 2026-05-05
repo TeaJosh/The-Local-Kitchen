@@ -357,6 +357,44 @@ def list_blog_posts(request):
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+@csrf_exempt
+@token_required
+def update_blog_post(request, post_id):
+    if request.method != 'PUT':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Must be logged in'}, status=401)
+
+    if request.user.role != CustomUser.MEMBER:
+        return JsonResponse({'error': 'Must be a Member'}, status=403)
+
+    try:
+        post = BlogPost.objects.get(id=post_id)
+    except BlogPost.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    if post.author != request.user:
+        return JsonResponse({'error': 'Not allowed'}, status=403)
+
+    data = json.loads(request.body)
+
+    post.title = data.get('title', post.title)
+    post.subheading = data.get('subheading', post.subheading)
+    post.image = data.get('image', post.image)
+    post.section = data.get('section', post.section)
+    post.cuisine = data.get('cuisine', post.cuisine)
+    post.occasion = data.get('occasion', post.occasion)
+    post.vibe = data.get('vibe', post.vibe)
+    post.city = data.get('city', post.city)
+    post.state = data.get('state', post.state)
+    post.content = data.get('content', post.content)
+    post.allow_comments = data.get('allow_comments', post.allow_comments)
+    post.is_anonymous = data.get('is_anonymous', post.is_anonymous)
+    post.save()
+
+    return JsonResponse({'message': 'Updated', 'post_id': post.id})
+
 
 @csrf_exempt
 def post_comments(request, post_id):

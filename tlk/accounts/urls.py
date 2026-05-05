@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/posts/create/', views.create_blog_post, name='create_post'),
     path('api/posts/<int:post_id>/', views.blog_post_detail, name='post_detail'),
     path('api/posts/<int:post_id>/delete/', views.delete_blog_post, name='delete_post'),
+    path('api/posts/<int:post_id>/update/', views.update_blog_post, name='update_post'),
 
     # Blog Comment URLs
     path('api/posts/<int:post_id>/comments/', views.post_comments, name='post_comments'),
