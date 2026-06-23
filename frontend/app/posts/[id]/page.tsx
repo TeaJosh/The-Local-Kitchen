@@ -43,60 +43,53 @@ export default async function Page({
   return (
     <div className="min-h-screen bg-white flex justify-center">
       <div className="max-w-3xl w-full px-6 py-10">
-        {/* ===================== */}
-        {/* TITLE */}
-        {/* ===================== */}
-        <h1 className="text-4xl font-bold text-center leading-tight">
+        {/* Title */}
+        <h1 className="text-4xl font-bold text-left leading-tight" style={{ marginTop: "1rem" }}>
           {post.title}
         </h1>
 
-        {/* AUTHOR */}
-        <div className="flex items-center justify-center gap-3 mt-4">
-          {/* Avatar */}
-          {post.author?.image ? (
-            <img
-              src={
-                post.author.image.startsWith("http")
-                  ? post.author.image
-                  : `${process.env.NEXT_PUBLIC_API_URL}${post.author.image}`
-              }
-              className="w-10 h-10 rounded-full object-cover"
-              alt={authorName}
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
-              {authorName.charAt(0).toUpperCase()}
-            </div>
-          )}
-
-          {/* Username */}
-          <span className="text-gray-600 text-sm">{authorName}</span>
-        </div>
-
-        {/* DATE */}
-        <p className="text-gray-500 text-center mt-3 text-sm">
-          {new Date(post.created_at).toLocaleDateString()}
-        </p>
-        {/* DELETE (only visible to the author) */}
-        <div className="flex justify-center mt-2">
-          <DeletePostButton postId={post.id} authorUsername={typeof post.author === "string" ? post.author : post.author?.username || ""} />
-        </div>
-
-        {/* ===================== */}
-        {/* HEADING */}
-        {/* ===================== */}
-        {post.heading && (
-          <p className="text-gray-700 text-center mt-4 text-lg font-medium">
-            {post.heading}
+        {/* Subheading */}
+        {post.subheading && (
+          <p className="text-gray-600 text-left mt-4 text-lg" style={{ margin: "0.5rem" }}>
+            {post.subheading}
           </p>
         )}
 
-        {/* Featured image (if available) */}
+        {/* Author + Date */}
+        <div className="flex flex-col items-left gap-1 mt-4" >
+          <div className="flex items-center gap-3">
+            {/* Avatar */}
+            {post.author?.image ? (
+              <img
+                src={
+                  post.author.image.startsWith("http")
+                    ? post.author.image
+                    : `${process.env.NEXT_PUBLIC_API_URL}${post.author.image}`
+                }
+                className="w-10 h-10 rounded-full object-cover" style={{ marginTop: "0.5rem" }}
+                alt={authorName}
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold">
+                {authorName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="flex flex-col">
+              <span className="text-gray-600 text-sm">{authorName}</span>
+              <span className="text-gray-500 text-sm">
+                {new Date(post.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured image */}
         {post.image && (
           <img
             src={post.image}
             alt={post.title}
-            className="mt-8 rounded-xl w-full max-h-[500px] object-cover shadow-md"
+            style={{ marginTop: "1rem", marginBottom: "2rem" }}
+            className="mt-10 mb-10 rounded-xl w-full max-h-[500px] object-cover shadow-md"
           />
         )}
 
@@ -106,7 +99,7 @@ export default async function Page({
           internally and sanitized server-side before storage.
         */}
         <div
-          className="prose prose-neutral mx-auto mt-8"
+          className="prose prose-neutral mx-auto mt-12"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 

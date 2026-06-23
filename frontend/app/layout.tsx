@@ -5,7 +5,7 @@ import ConditionalFooter from "@/components/ConditionalFooter";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
-// import Chatbot from "@/components/Chatbot";
+import Chatbot from "@/components/Chatbot";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
         <ConditionalHeader />
         <TooltipProvider>
           <main className="flex-grow">{children}</main>
-          {/* <Chatbot /> */}
+          { <Chatbot /> }
         </TooltipProvider>
         <ConditionalFooter />
       </body>
