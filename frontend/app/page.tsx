@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="bg-white dark:bg-black font-sans min-h-screen">
 
-      {/* Hero Banner */}
+      {/* Hero banner */}
       <div className="w-full relative h-screen overflow-hidden">
         <video
           src="/videos/tlk-video.mp4"
@@ -22,13 +22,13 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Our Story Section */}
+      {/* Our Story */}
       <div className="px-4 sm:px-10 py-6 flex flex-col justify-center items-center" style={{ marginTop: "64px" }}>
         <div className="max-w-screen-xl max-lg:max-w-3xl mx-auto">
           <div className="grid lg:grid-cols-2 items-center gap-x-12 gap-y-16">
             <div className="max-lg:text-center">
               <h1 className="md:text-4xl text-3xl !leading-tight font-bold mb-6">Our Story</h1>
-              <p className="text-lg text-slate-800 leading-relaxed" style={{ marginTop: "24px" }}>
+              <p className="text-base text-slate-800 leading-relaxed" style={{ marginTop: "24px" }}>
                 The Local Kitchen began as an idea shared by five college students.
                 As foodies, we were frustrated by how difficult it was to discover underrated restaurants on major food platforms.
                 At the same time, many small businesses across Minnesota were struggling to stay afloat amid a challenging economic and labor landscape.
@@ -62,7 +62,7 @@ export default function Home() {
 
           {/* Blog card */}
           <Link href="/blog/">
-            <div className="bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden flex flex-col h-full">
+            <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden flex flex-col h-full hover:shadow-md hover:scale-[1.01] transition">
               <div className="aspect-[3/2]">
                 <Image
                   src="/images/blog.jpg"
@@ -73,7 +73,7 @@ export default function Home() {
                 />
               </div>
               <div className="p-4">
-                <h2 className="text-base md:text-lg font-semibold mb-2">Blog</h2>
+                <h2 className="text-base font-semibold mb-2">Blog</h2>
                 <p className="text-sm text-slate-700 leading-relaxed">
                   Explore real stories from your community—highlighting local food culture, hidden gems, and underrepresented restaurants.
                   Share your own experiences and help bring attention to places that deserve it most.
@@ -84,7 +84,7 @@ export default function Home() {
 
           {/* Restaurant card */}
           <Link href="/restaurants/">
-            <div className="bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden flex flex-col h-full">
+            <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden flex flex-col h-full hover:shadow-md hover:scale-[1.01] transition">
               <div className="aspect-[3/2]">
                 <Image
                   src="/images/restaurants.jpg"
@@ -95,7 +95,7 @@ export default function Home() {
                 />
               </div>
               <div className="p-4">
-                <h2 className="text-base md:text-lg font-semibold mb-2">Restaurants</h2>
+                <h2 className="text-base font-semibold mb-2">Restaurants</h2>
                 <p className="text-sm text-slate-700 leading-relaxed">
                   Discover restaurants by location and filter by cuisine, price, and features like pickup or online ordering.
                   Find exactly what you're craving while supporting local businesses in your area.
@@ -106,7 +106,7 @@ export default function Home() {
 
           {/* Volunteer card */}
           <Link href="/volunteer/">
-            <div className="bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden flex flex-col h-full">
+            <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden flex flex-col h-full hover:shadow-md hover:scale-[1.01] transition">
               <div className="aspect-[3/2]">
                 <Image
                   src="/images/volunteer.jpg"
@@ -117,7 +117,7 @@ export default function Home() {
                 />
               </div>
               <div className="p-4">
-                <h2 className="text-base md:text-lg font-semibold mb-2">Volunteer</h2>
+                <h2 className="text-base font-semibold mb-2">Volunteer</h2>
                 <p className="text-sm text-slate-700 leading-relaxed">
                   Be part of a platform that celebrates local food communities.
                   Share your time and talents to support small restaurants and make an impact.
@@ -129,19 +129,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Why Choose Us Section */}
+      {/* Why Choose Us */}
       <section className="flex h-[500px]" style={{ marginTop: "64px" }}>
         <div className="bg-sky-500 w-1/2 flex flex-col justify-center items-center text-center px-16">
           <h2 className="font-bold text-2xl lg:text-3xl text-white mb-6">
             Why Choose Us?
           </h2>
-          <p className="text-white text-base mb-6" style={{ margin: "18px", marginTop: "24px" }}>
+          <p className="text-white text-base" style={{ margin: "18px", marginTop: "24px" }}>
             We make it easy to discover and order from local restaurants all in one place.
             By combining powerful search tools with real stories from the community, The Local Kitchen helps you find hidden gems, explore new cuisines, and order with confidence.
             Every interaction supports small and underrepresented restaurants, bringing more visibility to the people and cultures behind the food.
           </p>
           <Link href="/about">
-            <div className="border text-base text-white font-semibold hover:bg-white hover:text-sky-500" style={{ marginTop: "12px", padding: "16px" }}>
+            <div className="border border-current text-base text-white font-semibold hover:bg-white hover:text-sky-500 transition" style={{ marginTop: "12px", padding: "16px" }}>
               Learn More About Our Mission
             </div>
           </Link>
@@ -157,7 +157,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Have a Question Section */}
+      {/* Have a Question */}
       <div className="bg-sky-800 px-8 py-16" style={{ minHeight: "350px" }}>
         <div className="flex flex-col md:flex-row items-center justify-center gap-12">
           <div className="text-center md:text-left max-w-md" style={{ marginTop: "48px" }}>
@@ -167,7 +167,7 @@ export default function Home() {
             <p className="text-base text-white" style={{ marginTop: "24px", marginBottom: "24px" }}>
               We're here with the answer. Fill out the contact form on the next page and we'll get back to you quickly.
             </p>
-            <a href="/contact" className="mt-8 inline-block border text-base text-white font-semibold hover:bg-white hover:text-sky-800" style={{ padding: "12px" }}>
+            <a href="/contact" className="inline-block border border-current text-base text-white font-semibold hover:bg-white hover:text-sky-800 transition" style={{ padding: "12px" }}>
               Contact
             </a>
           </div>
