@@ -175,202 +175,262 @@ export default function AccountPage() {
         }
     }
 
+    // Shared field styles — TLK Design System v3, Section 5 (Form Fields)
+    const labelStyle = "text-sm font-semibold text-gray-500";
+    const defaultInputClass =
+        "bg-gray-100 rounded-xl text-base text-gray-700 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500";
+    const inputPadding = { padding: "18px 20px" };
+
     return (
         <div className="flex min-h-screen">
 
             {/* Sidebar */}
-            <aside className="flex flex-col w-64 h-screen px-4 py-8 overflow-y-auto bg-white border-r rtl:border-r-0 rtl:border-l dark:bg-gray-900 dark:border-gray-700">
-                <div className="flex flex-col justify-between flex-1 mt-6">
-                    <nav className="flex flex-col gap-1">
-                        <Link href="/account/settings/account" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaUserCog />Account</span>
+            <aside
+                className="flex flex-col w-64 h-screen overflow-y-auto bg-white border-r border-gray-200"
+                style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "32px", paddingBottom: "32px" }}
+            >
+                <nav className="flex flex-col gap-1" style={{ marginTop: "24px" }}>
+                    {[
+                        { href: "/account/settings/account", icon: <FaUserCog />, label: "Account" },
+                        { href: "/account/settings/profile", icon: <FaUser />, label: "Profile" },
+                        { href: "/account/settings/privacy", icon: <FaLock />, label: "Privacy" },
+                        { href: "/account/settings/notifications", icon: <FaEnvelope />, label: "Notifications" },
+                        { href: "/account/settings/address", icon: <FaAddressBook />, label: "Address" },
+                        { href: "/account/settings/payment-methods", icon: <FaCreditCard />, label: "Payment Methods" },
+                        { href: "/account/settings/order-history", icon: <FaHistory />, label: "Order History" },
+                        { href: "/account/settings/saved-posts", icon: <FaBookmark />, label: "Saved Posts" },
+                    ].map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className="flex items-center gap-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100"
+                            style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "8px", paddingBottom: "8px" }}
+                        >
+                            {item.icon}
+                            {item.label}
                         </Link>
-                        <Link href="/account/settings/profile" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaUser />Profile</span>
-                        </Link>
-                        <Link href="/account/settings/privacy" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaLock />Privacy</span>
-                        </Link>
-                        <Link href="/account/settings/notifications" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaEnvelope />Notifications</span>
-                        </Link>
-                        <Link href="/account/settings/address" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaAddressBook />Address</span>
-                        </Link>
-                        <Link href="/account/settings/payment-methods" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaCreditCard />Payment Methods</span>
-                        </Link>
-                        <Link href="/account/settings/order-history" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaHistory />Order History</span>
-                        </Link>
-                        <Link href="/account/settings/saved-posts" className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800">
-                            <span className="mx-4 font-medium flex items-center gap-2"><FaBookmark />Saved Posts</span>
-                        </Link>
-                    </nav>
-                </div>
+                    ))}
+                </nav>
             </aside>
 
             {/* Main Content */}
-            <div className="flex-1 p-12 flex flex-col items-center gap-6">
-                <h1 className="text-2xl font-bold">Account Settings</h1>
-                <div className="flex flex-col gap-4 p-6 border rounded-xl w-full max-w-3xl">
-                    <h2 className="text-lg font-semibold">Public Profile</h2>
-                    <p className="text-base font-medium">This is the main profile that will be visible to everyone</p>
-                    <p><strong>Username:</strong> {username}</p>
-                    <p><strong>Email:</strong> {email ?? "Not set"}</p>
-                    <p><strong>Account Created:</strong> {accountCreated}</p>
-                    <Link href="/account/settings/profile" className="text-sm text-blue-500 hover:underline">Edit Profile</Link>
+            <div
+                className="flex-1 flex flex-col items-center gap-6"
+                style={{ padding: "48px" }}
+            >
+                <h1 className="text-2xl font-bold text-slate-800">Account Settings</h1>
+
+                {/* Public Profile */}
+                <div
+                    className="flex flex-col gap-4 bg-white border border-gray-200 rounded-xl shadow-sm w-full max-w-3xl"
+                    style={{ padding: "40px" }}
+                >
+                    <h2 className="text-lg font-semibold text-slate-800">Public Profile</h2>
+                    <p className="text-sm text-gray-500">This is the main profile that will be visible to everyone</p>
+                    <p className="text-base text-slate-800"><strong>Username:</strong> {username}</p>
+                    <p className="text-base text-slate-800"><strong>Email:</strong> {email ?? "Not set"}</p>
+                    <p className="text-base text-slate-800"><strong>Account Created:</strong> {accountCreated}</p>
+                    <Link href="/account/settings/profile" className="text-sm font-semibold text-orange-500 hover:underline">
+                        Edit Profile
+                    </Link>
                 </div>
 
                 {/* Email Field */}
-                <div className="flex flex-col gap-4 p-6 border rounded-xl w-full max-w-3xl">
-                    <label className="text-lg font-semibold">Email</label>
+                <div
+                    className="flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm w-full max-w-3xl"
+                    style={{ padding: "40px" }}
+                >
+                    <h2 className="text-lg font-semibold text-slate-800" style={{ marginBottom: "24px" }}>Email</h2>
 
-                    <label className="text-sm text-gray-600">New Email</label>
-                    <input
-                        type="email"
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm w-full max-w-md"
-                        required
-                    />
-
-                    <label className="text-sm text-gray-600">Confirm New Email</label>
-                    <input
-                        type="email"
-                        value={confirmNewEmail}
-                        onChange={(e) => setConfirmNewEmail(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm w-full max-w-md"
-                        required
-                    />
-
-                    <label className="text-sm text-gray-600">Enter Password</label>
-                    <input
-                        type="password"
-                        value={emailPassword}
-                        onChange={(e) => setEmailPassword(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm w-full max-w-md"
-                    />
-                    <button
-                        onClick={handleEmailChange}
-                        className="px-4 py-2 border border-blue-400 text-sm font-semibold rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition self-start"
-                    >
-                        Change Email
-                    </button>
-                </div>
-
-                {/* Password Field */}
-                <div className="flex flex-col gap-4 p-6 border rounded-xl w-full max-w-3xl">
-                    <div className="flex flex-col gap-2">
-                        <p className="text-base font-semibold">Password</p>
-                        <label className="text-sm text-gray-600">Current Password</label>
-                        <input
-                            type="password"
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm w-full max-w-md"
-                            required
-                        />
-                    </div>
-
-                    <div className="flex flex-col gap-2 w-full max-w-md">
-                        <label className="text-sm text-gray-600">New Password</label>
-                        <div className="relative">
+                    <div className="flex flex-col" style={{ gap: "20px" }}>
+                        <div>
+                            <label className={labelStyle} style={{ display: "block", marginBottom: "8px" }}>
+                                New Email
+                            </label>
                             <input
-                                type={showNewPassword ? "text" : "password"}
-                                value={newPassword}
-                                minLength={8}
-                                maxLength={64}
-                                onChange={(e) => {
-                                    setNewPassword(e.target.value)
-                                    setPasswordTouched(true);
-                                }}
-                                className={`w-full rounded-lg px-3 py-2.5 text-sm focus:outline-none transition duration-300 ease
-                                    ${passwordTouched && newPassword.length > 0
-                                        ? passwordValid
-                                            ? "bg-transparent text-green-500 border border-green-200 focus:border-green-500 hover:border-green-300 focus:shadow shadow-sm"
-                                            : "bg-transparent text-red-500 border border-red-200 focus:border-red-500 hover:border-red-300 focus:shadow shadow-sm"
-                                        : "border border-gray-300"
-                                    }`}
+                                type="email"
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                className={defaultInputClass}
+                                style={inputPadding}
+                                required
                             />
-                            <button
-                                type="button"
-                                onClick={() => setShowNewPassword((prev) => !prev)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                            >
-                                {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
                         </div>
 
-                        {/* Password strength criteria */}
-                        {passwordTouched && newPassword.length > 0 && (
-                            <ul className="mt-1 space-y-1 text-xs">
-                                {[
-                                    { key: "length", label: "At least 8 characters" },
-                                    { key: "uppercase", label: "One uppercase letter (A–Z)" },
-                                    { key: "lowercase", label: "One lowercase letter (a–z)" },
-                                    { key: "number", label: "One number (0–9)" },
-                                    { key: "specialChar", label: "One special character (@$!%*?&)" },
-                                ].map(({ key, label }) => (
-                                    <li
-                                        key={key}
-                                        className={`flex items-center gap-2 ${passwordCriteria[key as keyof typeof passwordCriteria]
-                                            ? "text-green-500"
-                                            : "text-red-500"
-                                            }`}
-                                    >
-                                        <span className="font-bold">
-                                            {passwordCriteria[key as keyof typeof passwordCriteria] ? "✓" : "✗"}
-                                        </span>
-                                        {label}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
+                        <div>
+                            <label className={labelStyle} style={{ display: "block", marginBottom: "8px" }}>
+                                Confirm New Email
+                            </label>
+                            <input
+                                type="email"
+                                value={confirmNewEmail}
+                                onChange={(e) => setConfirmNewEmail(e.target.value)}
+                                className={defaultInputClass}
+                                style={inputPadding}
+                                required
+                            />
+                        </div>
 
-                    <label className="text-sm text-gray-600">Confirm New Password</label>
-                    <input
-                        type="password"
-                        value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}
-                        className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm w-full max-w-md"
-                    />
-                    <button
-                        onClick={handlePasswordChange}
-                        className="px-4 py-2 border border-blue-400 text-sm font-semibold rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition self-start"
-                    >
-                        Change Password
-                    </button>
-                </div>
+                        <div>
+                            <label className={labelStyle} style={{ display: "block", marginBottom: "8px" }}>
+                                Enter Password
+                            </label>
+                            <input
+                                type="password"
+                                value={emailPassword}
+                                onChange={(e) => setEmailPassword(e.target.value)}
+                                className={defaultInputClass}
+                                style={inputPadding}
+                            />
+                        </div>
 
-                {/* Danger Zone */}
-                <div className="flex flex-col gap-4 p-6 border rounded-xl w-full max-w-3xl">
-                    <div className="flex flex-col gap-2">
-                        <p className="text-base font-semibold">Delete Account</p>
-                        <p className="text-sm">
-                            Permanently remove your account. This action cannot be undone.
-                        </p>
                         <button
-                            onClick={() => setShowModal(true)}
-                            className="px-4 py-2 border border-blue-400 text-sm font-semibold rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition self-start"
+                            onClick={handleEmailChange}
+                            className="bg-orange-500 text-white font-bold text-base rounded-full hover:bg-orange-600 transition cursor-pointer self-start"
+                            style={{ paddingLeft: "28px", paddingRight: "28px", paddingTop: "14px", paddingBottom: "14px" }}
                         >
-                            Delete Account
+                            Change Email
                         </button>
                     </div>
                 </div>
+
+                {/* Password Field */}
+                <div
+                    className="flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm w-full max-w-3xl"
+                    style={{ padding: "40px" }}
+                >
+                    <h2 className="text-lg font-semibold text-slate-800" style={{ marginBottom: "24px" }}>Password</h2>
+
+                    <div className="flex flex-col" style={{ gap: "20px" }}>
+                        <div>
+                            <label className={labelStyle} style={{ display: "block", marginBottom: "8px" }}>
+                                Current Password
+                            </label>
+                            <input
+                                type="password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                className={defaultInputClass}
+                                style={inputPadding}
+                                required
+                            />
+                        </div>
+
+                        <div className="w-full max-w-md">
+                            <label className={labelStyle} style={{ display: "block", marginBottom: "8px" }}>
+                                New Password
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type={showNewPassword ? "text" : "password"}
+                                    value={newPassword}
+                                    minLength={8}
+                                    maxLength={64}
+                                    onChange={(e) => {
+                                        setNewPassword(e.target.value)
+                                        setPasswordTouched(true);
+                                    }}
+                                    style={inputPadding}
+                                    className={`w-full rounded-xl text-base focus:outline-none transition duration-300 ease
+                                        ${passwordTouched && newPassword.length > 0
+                                            ? passwordValid
+                                                ? "bg-transparent text-green-500 border border-green-200 focus:border-green-500 hover:border-green-300 focus:shadow shadow-sm"
+                                                : "bg-transparent text-red-500 border border-red-200 focus:border-red-500 hover:border-red-300 focus:shadow shadow-sm"
+                                            : "bg-gray-100 text-gray-700"
+                                        }`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowNewPassword((prev) => !prev)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                >
+                                    {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                                </button>
+                            </div>
+
+                            {/* Password strength criteria */}
+                            {passwordTouched && newPassword.length > 0 && (
+                                <ul className="text-xs" style={{ marginTop: "8px" }}>
+                                    {[
+                                        { key: "length", label: "At least 8 characters" },
+                                        { key: "uppercase", label: "One uppercase letter (A–Z)" },
+                                        { key: "lowercase", label: "One lowercase letter (a–z)" },
+                                        { key: "number", label: "One number (0–9)" },
+                                        { key: "specialChar", label: "One special character (@$!%*?&)" },
+                                    ].map(({ key, label }) => (
+                                        <li
+                                            key={key}
+                                            className={`flex items-center gap-2 ${passwordCriteria[key as keyof typeof passwordCriteria]
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                                }`}
+                                            style={{ marginTop: "4px" }}
+                                        >
+                                            <span className="font-bold">
+                                                {passwordCriteria[key as keyof typeof passwordCriteria] ? "✓" : "✗"}
+                                            </span>
+                                            {label}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className={labelStyle} style={{ display: "block", marginBottom: "8px" }}>
+                                Confirm New Password
+                            </label>
+                            <input
+                                type="password"
+                                value={confirmNewPassword}
+                                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                className={defaultInputClass}
+                                style={inputPadding}
+                            />
+                        </div>
+
+                        <button
+                            onClick={handlePasswordChange}
+                            className="bg-orange-500 text-white font-bold text-base rounded-full hover:bg-orange-600 transition cursor-pointer self-start"
+                            style={{ paddingLeft: "28px", paddingRight: "28px", paddingTop: "14px", paddingBottom: "14px" }}
+                        >
+                            Change Password
+                        </button>
+                    </div>
+                </div>
+
+                {/* Danger Zone */}
+                <div
+                    className="flex flex-col bg-white border border-gray-200 rounded-xl shadow-sm w-full max-w-3xl"
+                    style={{ padding: "40px" }}
+                >
+                    <h2 className="text-lg font-semibold text-slate-800" style={{ marginBottom: "8px" }}>Delete Account</h2>
+                    <p className="text-sm text-gray-500" style={{ marginBottom: "16px" }}>
+                        Permanently remove your account. This action cannot be undone.
+                    </p>
+                    <button
+                        onClick={() => setShowModal(true)}
+                        className="bg-red-600 text-white font-bold text-base rounded-full hover:bg-red-700 transition cursor-pointer self-start"
+                        style={{ paddingLeft: "28px", paddingRight: "28px", paddingTop: "14px", paddingBottom: "14px" }}
+                    >
+                        Delete Account
+                    </button>
+                </div>
             </div>
 
-            {/* Modal */}
+            {/* Delete Account Confirmation */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div className="flex flex-col items-center bg-white shadow-md rounded-xl py-6 px-5 w-[370px] md:w-[460px] border border-gray-200">
-                        <h2 className="text-gray-900 font-semibold mt-4 text-xl">Are you sure?</h2>
-                        <FaExclamationTriangle className="text-red-500 text-5xl mt-3" />
-                        <p className="text-sm text-gray-600 mt-2 text-center">
+                    <div
+                        className="flex flex-col items-center bg-white shadow-md rounded-xl border border-gray-200 w-[370px] md:w-[460px]"
+                        style={{ paddingTop: "24px", paddingBottom: "24px", paddingLeft: "20px", paddingRight: "20px" }}
+                    >
+                        <h2 className="text-slate-800 font-semibold text-xl" style={{ marginTop: "16px" }}>Are you sure?</h2>
+                        <FaExclamationTriangle className="text-red-500 text-5xl" style={{ marginTop: "12px" }} />
+                        <p className="text-sm text-gray-500 text-center" style={{ marginTop: "8px" }}>
                             Do you really want to delete your account? This action cannot be undone.
                         </p>
-                        <div className="flex items-center justify-center gap-4 mt-5 w-full">
+                        <div className="flex items-center justify-center gap-4 w-full" style={{ marginTop: "20px" }}>
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="w-full md:w-36 h-10 rounded-md border border-gray-300 bg-white text-gray-600 font-medium text-sm hover:bg-gray-100 active:scale-95 transition"
@@ -379,7 +439,7 @@ export default function AccountPage() {
                             </button>
                             <button
                                 onClick={handleAccountDeletion}
-                                className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 font-medium font-semibold text-sm hover:bg-red-700 active:scale-95 transition"
+                                className="w-full md:w-36 h-10 rounded-md text-white bg-red-600 font-semibold text-sm hover:bg-red-700 active:scale-95 transition"
                             >
                                 Confirm
                             </button>

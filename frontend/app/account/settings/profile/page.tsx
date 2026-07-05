@@ -161,8 +161,18 @@ export default function ProfilePage() {
         : `${baseUrl}${profile.image}`
       : "https://i.pravatar.cc/150");
 
-  if (loading) return <div className="p-8">Loading...</div>;
-  if (!profile) return <div className="p-8">Failed to load profile</div>;
+  if (loading)
+    return (
+      <div className="text-base text-slate-800" style={{ padding: "32px" }}>
+        Loading...
+      </div>
+    );
+  if (!profile)
+    return (
+      <div className="text-base text-slate-800" style={{ padding: "32px" }}>
+        Failed to load profile
+      </div>
+    );
 
   const fullName =
     `${profile.first_name || ""} ${profile.last_name || ""}`.trim() ||
@@ -222,10 +232,13 @@ export default function ProfilePage() {
 
   return (
     <div className="bg-gray-50 min-h-screen flex justify-center">
-      <div className="w-full max-w-7xl p-10 grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-14">
+      <div
+        className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-12"
+        style={{ padding: "40px" }}
+      >
         {/* LEFT */}
-        <div className="space-y-10">
-          <h1 className="text-3xl font-bold">{fullName}</h1>
+        <div className="flex flex-col gap-10">
+          <h1 className="text-4xl font-extrabold text-slate-800">{fullName}</h1>
 
           {/* TABS */}
           <div className="flex gap-6 text-sm">
@@ -233,11 +246,12 @@ export default function ProfilePage() {
               <button
                 key={t}
                 onClick={() => setTab(t as any)}
-                className={`pb-3 capitalize ${
+                className={`capitalize ${
                   tab === t
-                    ? "border-b-2 border-black font-semibold"
-                    : "text-gray-500 hover:text-black"
+                    ? "border-b-2 border-orange-500 font-semibold text-slate-800"
+                    : "text-gray-500 hover:text-slate-800"
                 }`}
+                style={{ paddingBottom: "12px" }}
               >
                 {t}
               </button>
@@ -246,7 +260,10 @@ export default function ProfilePage() {
 
           {/* HOME */}
           {tab === "home" && (
-            <div className="space-y-10 max-w-3xl mx-auto">
+            <div
+              className="max-w-3xl flex flex-col gap-10"
+              style={{ margin: "0 auto" }}
+            >
               {homePosts.length === 0 ? (
                 <p className="text-gray-500">No posts yet.</p>
               ) : (
@@ -257,7 +274,7 @@ export default function ProfilePage() {
                     <Link
                       key={post.id}
                       href={`/posts/${post.id}`}
-                      className="block bg-white rounded-2xl shadow-sm hover:shadow-lg hover:scale-[1.01] transition"
+                      className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition"
                     >
                       {image && (
                         <img
@@ -267,20 +284,32 @@ export default function ProfilePage() {
                         />
                       )}
 
-                      <div className="p-7 space-y-5">
+                      <div
+                        className="flex flex-col gap-5"
+                        style={{ padding: "24px" }}
+                      >
                         <div className="flex gap-2 flex-wrap">
-                          <span className="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+                          <span
+                            className="rounded-full text-xs font-medium bg-blue-100 text-blue-700"
+                            style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
+                          >
                             {post.section}
                           </span>
-                          <span className="px-3 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
+                          <span
+                            className="rounded-full text-xs font-medium bg-orange-100 text-orange-700"
+                            style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
+                          >
                             {post.cuisine}
                           </span>
-                          <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-700">
+                          <span
+                            className="rounded-full text-xs font-medium bg-purple-100 text-purple-700"
+                            style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
+                          >
                             {post.occasion}
                           </span>
                         </div>
 
-                        <h2 className="text-2xl font-bold">
+                        <h2 className="text-2xl font-bold text-slate-800">
                           {post.title || "Untitled"}
                         </h2>
 
@@ -288,7 +317,9 @@ export default function ProfilePage() {
                           {post.city}, {post.state}
                         </p>
 
-                        <p className="text-gray-600">{post.subheading}</p>
+                        <p className="text-sm text-slate-700" style={{ lineHeight: "1.6" }}>
+                          {post.subheading}
+                        </p>
 
                         <div className="flex justify-between text-sm text-gray-500">
                           <span>By {post.author?.username || post.author}</span>
@@ -306,21 +337,28 @@ export default function ProfilePage() {
 
           {/* ABOUT */}
           {tab === "about" && (
-            <div className="bg-white p-6 rounded-2xl shadow-sm max-w-3xl mx-auto">
-              <p>{profile.bio || "—"}</p>
+            <div
+              className="max-w-3xl bg-white rounded-2xl shadow-sm"
+              style={{ padding: "24px", margin: "0 auto" }}
+            >
+              <p className="text-base text-slate-800">{profile.bio || "—"}</p>
             </div>
           )}
 
           {/* ACTIVITY */}
           {tab === "activity" && (
-            <div className="space-y-4 max-w-3xl mx-auto">
+            <div
+              className="max-w-3xl flex flex-col gap-4"
+              style={{ margin: "0 auto" }}
+            >
               {activity.length === 0 ? (
                 <p className="text-gray-500">No activity yet.</p>
               ) : (
                 activity.map((item) => (
                   <div
                     key={item.id}
-                    className="relative bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition"
+                    className="relative bg-white rounded-xl shadow-sm hover:shadow-md transition"
+                    style={{ padding: "16px" }}
                   >
                     {item.type === "comment" && (
                       <button
@@ -332,17 +370,26 @@ export default function ProfilePage() {
                     )}
 
                     <Link href={item.link}>
-                      <div className="text-xs text-gray-400 mb-1">
+                      <div
+                        className="text-xs text-gray-400"
+                        style={{ marginBottom: "4px" }}
+                      >
                         {item.type === "post" ? "🟢 Post" : " Comment"}
                       </div>
 
-                      <p className="font-medium pr-6">
+                      <p
+                        className="font-medium text-slate-800"
+                        style={{ paddingRight: "24px" }}
+                      >
                         {item.type === "post"
                           ? item.title
                           : `You commented: "${item.title}"`}
                       </p>
 
-                      <div className="text-xs text-gray-400 mt-2">
+                      <div
+                        className="text-xs text-gray-400"
+                        style={{ marginTop: "8px" }}
+                      >
                         {new Date(item.created_at).toLocaleString()}
                       </div>
                     </Link>
@@ -355,14 +402,18 @@ export default function ProfilePage() {
 
         {/* RIGHT */}
         <aside className="w-full max-w-sm">
-          <div className="bg-white rounded-2xl shadow-sm p-6 text-center space-y-4 sticky top-10 overflow-hidden">
+          <div
+            className="bg-white rounded-2xl shadow-sm text-center flex flex-col gap-4 sticky top-10 overflow-hidden"
+            style={{ padding: "24px" }}
+          >
             <img
               src={profileImage}
-              className="w-24 h-24 rounded-full object-cover border mx-auto"
+              className="w-24 h-24 rounded-full object-cover border"
+              style={{ margin: "0 auto" }}
               alt={profile.username}
             />
 
-            <div className="text-sm text-gray-600 space-y-1 text-left break-words">
+            <div className="flex flex-col gap-1 text-sm text-gray-500 text-left break-words">
               <p className="truncate">
                 <b>User Name:</b> {profile.username}
               </p>
@@ -379,7 +430,8 @@ export default function ProfilePage() {
 
             <Link
               href="/account/settings/profile/edit-profile"
-              className="bg-black text-white px-5 py-2 rounded-lg hover:opacity-80 transition inline-block w-full"
+              className="bg-orange-500 text-white font-bold text-base rounded-full hover:bg-orange-600 transition inline-block w-full"
+              style={{ paddingTop: "14px", paddingBottom: "14px" }}
             >
               Edit Profile
             </Link>
