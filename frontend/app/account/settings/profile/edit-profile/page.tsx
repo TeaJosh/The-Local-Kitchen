@@ -185,7 +185,6 @@ export default function EditProfilePage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
       <aside
         className="flex flex-col w-64 h-screen overflow-y-auto bg-white border-r border-gray-200"
         style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "32px", paddingBottom: "32px" }}
@@ -204,8 +203,7 @@ export default function EditProfilePage() {
           ))}
         </nav>
       </aside>
-
-      {/* MAIN */}
+      
       <div className="flex-1 flex justify-center" style={{ padding: "32px" }}>
         <div
           className="bg-white w-full max-w-4xl rounded-xl shadow-sm"

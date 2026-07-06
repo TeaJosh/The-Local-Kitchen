@@ -260,10 +260,7 @@ export default function ProfilePage() {
 
           {/* HOME */}
           {tab === "home" && (
-            <div
-              className="max-w-3xl flex flex-col gap-10"
-              style={{ margin: "0 auto" }}
-            >
+            <div className="max-w-3xl flex flex-col gap-10">
               {homePosts.length === 0 ? (
                 <p className="text-gray-500">No posts yet.</p>
               ) : (
@@ -290,19 +287,19 @@ export default function ProfilePage() {
                       >
                         <div className="flex gap-2 flex-wrap">
                           <span
-                            className="rounded-full text-xs font-medium bg-blue-100 text-blue-700"
+                            className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
                             style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
                           >
                             {post.section}
                           </span>
                           <span
-                            className="rounded-full text-xs font-medium bg-orange-100 text-orange-700"
+                            className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
                             style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
                           >
                             {post.cuisine}
                           </span>
                           <span
-                            className="rounded-full text-xs font-medium bg-purple-100 text-purple-700"
+                            className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
                             style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
                           >
                             {post.occasion}
@@ -339,7 +336,7 @@ export default function ProfilePage() {
           {tab === "about" && (
             <div
               className="max-w-3xl bg-white rounded-2xl shadow-sm"
-              style={{ padding: "24px", margin: "0 auto" }}
+              style={{ padding: "24px" }}
             >
               <p className="text-base text-slate-800">{profile.bio || "—"}</p>
             </div>
@@ -347,10 +344,7 @@ export default function ProfilePage() {
 
           {/* ACTIVITY */}
           {tab === "activity" && (
-            <div
-              className="max-w-3xl flex flex-col gap-4"
-              style={{ margin: "0 auto" }}
-            >
+            <div className="max-w-3xl flex flex-col gap-4">
               {activity.length === 0 ? (
                 <p className="text-gray-500">No activity yet.</p>
               ) : (
@@ -374,7 +368,7 @@ export default function ProfilePage() {
                         className="text-xs text-gray-400"
                         style={{ marginBottom: "4px" }}
                       >
-                        {item.type === "post" ? "🟢 Post" : " Comment"}
+                        {item.type === "post" ? "Post" : " Comment"}
                       </div>
 
                       <p
@@ -403,13 +397,12 @@ export default function ProfilePage() {
         {/* RIGHT */}
         <aside className="w-full max-w-sm">
           <div
-            className="bg-white rounded-2xl shadow-sm text-center flex flex-col gap-4 sticky top-10 overflow-hidden"
+            className="bg-white rounded-2xl shadow-sm flex flex-col gap-4 sticky top-10 overflow-hidden"
             style={{ padding: "24px" }}
           >
             <img
               src={profileImage}
               className="w-24 h-24 rounded-full object-cover border"
-              style={{ margin: "0 auto" }}
               alt={profile.username}
             />
 
@@ -423,14 +416,11 @@ export default function ProfilePage() {
               <p className="truncate">
                 <b>Email:</b> {profile.email}
               </p>
-              <p className="break-words">
-                <b>Bio:</b> {profile.bio || "—"}
-              </p>
             </div>
 
             <Link
               href="/account/settings/profile/edit-profile"
-              className="bg-orange-500 text-white font-bold text-base rounded-full hover:bg-orange-600 transition inline-block w-full"
+              className="bg-orange-500 text-white font-bold text-base text-center rounded-full hover:bg-orange-600 transition inline-block w-full"
               style={{ paddingTop: "14px", paddingBottom: "14px" }}
             >
               Edit Profile
