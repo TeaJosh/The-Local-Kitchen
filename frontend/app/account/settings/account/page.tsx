@@ -1,13 +1,27 @@
 "use client"
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { FaEye, FaEyeSlash, FaUserCog, FaUser, FaLock, FaEnvelope, FaAddressBook, FaCreditCard, FaHistory, FaBookmark, FaExclamationTriangle } from "react-icons/fa";
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
+// Sidebar nav items — shared shape with Profile / My Posts / Saved Posts so
+// the active-page highlight stays consistent across every settings page.
+const SIDEBAR_ITEMS = [
+    { href: "/account/settings/account", icon: <FaUserCog />, label: "Account" },
+    { href: "/account/settings/profile", icon: <FaUser />, label: "Profile" },
+    { href: "/account/settings/privacy", icon: <FaLock />, label: "Privacy" },
+    { href: "/account/settings/notifications", icon: <FaEnvelope />, label: "Notifications" },
+    { href: "/account/settings/address", icon: <FaAddressBook />, label: "Address" },
+    { href: "/account/settings/payment-methods", icon: <FaCreditCard />, label: "Payment Methods" },
+    { href: "/account/settings/order-history", icon: <FaHistory />, label: "Order History" },
+    { href: "/account/settings/saved-posts", icon: <FaBookmark />, label: "Saved Posts" },
+];
+
 export default function AccountPage() {
     const router = useRouter();
+    const pathname = usePathname();
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -77,7 +91,7 @@ export default function AccountPage() {
             .catch((err) => {
                 console.error("Profile fetch failed:", err);
 
-                // ONLY logout if truly unauthorized
+                // Only logout if truly unauthorized
                 if (err.message === "Unauthorized") {
                     localStorage.removeItem("token");
                     router.push("/auth/login");
@@ -174,8 +188,7 @@ export default function AccountPage() {
             alert("Failed to delete account.");
         }
     }
-
-    // Shared field styles — TLK Design System v3, Section 5 (Form Fields)
+    
     const labelStyle = "text-sm font-semibold text-gray-500";
     const defaultInputClass =
         "bg-gray-100 rounded-xl text-base text-gray-700 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500";
@@ -190,26 +203,20 @@ export default function AccountPage() {
                 style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "32px", paddingBottom: "32px" }}
             >
                 <nav className="flex flex-col gap-1" style={{ marginTop: "24px" }}>
-                    {[
-                        { href: "/account/settings/account", icon: <FaUserCog />, label: "Account" },
-                        { href: "/account/settings/profile", icon: <FaUser />, label: "Profile" },
-                        { href: "/account/settings/privacy", icon: <FaLock />, label: "Privacy" },
-                        { href: "/account/settings/notifications", icon: <FaEnvelope />, label: "Notifications" },
-                        { href: "/account/settings/address", icon: <FaAddressBook />, label: "Address" },
-                        { href: "/account/settings/payment-methods", icon: <FaCreditCard />, label: "Payment Methods" },
-                        { href: "/account/settings/order-history", icon: <FaHistory />, label: "Order History" },
-                        { href: "/account/settings/saved-posts", icon: <FaBookmark />, label: "Saved Posts" },
-                    ].map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-center gap-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100"
-                            style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "8px", paddingBottom: "8px" }}
-                        >
-                            {item.icon}
-                            {item.label}
-                        </Link>
-                    ))}
+                    {SIDEBAR_ITEMS.map((item) => {
+                        const active = pathname === item.href;
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center gap-2 text-sm font-medium rounded-lg hover:bg-gray-100 ${active ? "bg-gray-100 text-orange-500" : "text-gray-700"}`}
+                                style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "8px", paddingBottom: "8px" }}
+                            >
+                                {item.icon}
+                                {item.label}
+                            </Link>
+                        );
+                    })}
                 </nav>
             </aside>
 

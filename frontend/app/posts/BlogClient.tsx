@@ -154,6 +154,14 @@ export default function BlogClient({ posts = [] }: { posts: Post[] }) {
         });
     }, [safePosts, search, cuisine, occasion, vibe, sortBy]);
 
+    const hasActiveFilters = norm(cuisine) !== "all" || norm(occasion) !== "all" || norm(vibe) !== "all";
+
+    const resetFilters = () => {
+        setCuisine("All");
+        setOccasion("All");
+        setVibe("All");
+    };
+
     const Dropdown = ({
         label,
         value,
@@ -224,6 +232,12 @@ export default function BlogClient({ posts = [] }: { posts: Post[] }) {
                     <Dropdown label="Cuisine" value={cuisine} open={cuisineOpen} setOpen={setCuisineOpen} options={CUISINE_OPTIONS} refObj={cuisineRef} onSelect={setCuisine} />
                     <Dropdown label="Occasion" value={occasion} open={occasionOpen} setOpen={setOccasionOpen} options={OCCASION_OPTIONS} refObj={occasionRef} onSelect={setOccasion} />
                     <Dropdown label="Vibe" value={vibe} open={vibeOpen} setOpen={setVibeOpen} options={VIBE_OPTIONS} refObj={vibeRef} onSelect={setVibe} />
+
+                    {hasActiveFilters && (
+                        <button type="button" onClick={resetFilters} style={styles.resetButton}>
+                            Reset filters
+                        </button>
+                    )}
                 </div>
 
                 <div ref={sortRef} style={styles.dropdownWrap}>
@@ -313,7 +327,17 @@ const styles: Record<string, React.CSSProperties> = {
     toolbar: { padding: "0", marginBottom: "12px", background: "#fff" },
     search: { width: "100%", padding: "10px 12px", border: "1px solid #ccc", borderRadius: "10px", fontSize: "13px" },
     filtersBar: { display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "flex-start", flexWrap: "wrap", marginBottom: "20px" },
-    filtersRow: { display: "flex", flexWrap: "wrap", gap: "12px" },
+    filtersRow: { display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center" },
+    resetButton: {
+        border: "none",
+        background: "none",
+        color: "#666",
+        fontSize: "13px",
+        fontWeight: 600,
+        textDecoration: "underline",
+        cursor: "pointer",
+        padding: "0",
+    },
     dropdownWrap: { position: "relative" },
     dropdownButton: {
         display: "flex",

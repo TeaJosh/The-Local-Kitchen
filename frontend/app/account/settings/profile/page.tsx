@@ -2,6 +2,17 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import {
+  FaUserCog,
+  FaUser,
+  FaLock,
+  FaEnvelope,
+  FaAddressBook,
+  FaCreditCard,
+  FaHistory,
+  FaBookmark,
+} from "react-icons/fa";
 
 type Profile = {
   id: number;
@@ -10,12 +21,25 @@ type Profile = {
   first_name: string;
   last_name: string;
   bio?: string;
-  city?: string;
-  state?: string;
   image?: string | null;
 };
 
+// Sidebar nav items — matches AccountPage.tsx exactly so every settings
+// page (Account, Profile, My Posts, Saved Posts, etc.) shares the same nav.
+const SIDEBAR_ITEMS = [
+  { href: "/account/settings/account", icon: <FaUserCog />, label: "Account" },
+  { href: "/account/settings/profile", icon: <FaUser />, label: "Profile" },
+  { href: "/account/settings/privacy", icon: <FaLock />, label: "Privacy" },
+  { href: "/account/settings/notifications", icon: <FaEnvelope />, label: "Notifications" },
+  { href: "/account/settings/address", icon: <FaAddressBook />, label: "Address" },
+  { href: "/account/settings/payment-methods", icon: <FaCreditCard />, label: "Payment Methods" },
+  { href: "/account/settings/order-history", icon: <FaHistory />, label: "Order History" },
+  { href: "/account/settings/saved-posts", icon: <FaBookmark />, label: "Saved Posts" },
+];
+
 export default function ProfilePage() {
+  const pathname = usePathname();
+
   const [profile, setProfile] = useState<Profile | null>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [allComments, setAllComments] = useState<any[]>([]);
@@ -163,14 +187,20 @@ export default function ProfilePage() {
 
   if (loading)
     return (
-      <div className="text-base text-slate-800" style={{ padding: "32px" }}>
-        Loading...
+      <div className="flex min-h-screen">
+        <SettingsSidebar pathname={pathname} />
+        <div className="flex-1 text-base text-slate-800" style={{ padding: "32px" }}>
+          Loading...
+        </div>
       </div>
     );
   if (!profile)
     return (
-      <div className="text-base text-slate-800" style={{ padding: "32px" }}>
-        Failed to load profile
+      <div className="flex min-h-screen">
+        <SettingsSidebar pathname={pathname} />
+        <div className="flex-1 text-base text-slate-800" style={{ padding: "32px" }}>
+          Failed to load profile
+        </div>
       </div>
     );
 
@@ -231,203 +261,231 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="bg-gray-50 min-h-screen flex justify-center">
-      <div
-        className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-12"
-        style={{ padding: "40px" }}
-      >
-        {/* LEFT */}
-        <div className="flex flex-col gap-10">
-          <h1 className="text-4xl font-extrabold text-slate-800">{fullName}</h1>
+    <div className="flex min-h-screen bg-gray-50">
+      <SettingsSidebar pathname={pathname} />
 
-          {/* TABS */}
-          <div className="flex gap-6 text-sm">
-            {["home", "about", "activity"].map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t as any)}
-                className={`capitalize ${
-                  tab === t
-                    ? "border-b-2 border-orange-500 font-semibold text-slate-800"
-                    : "text-gray-500 hover:text-slate-800"
-                }`}
-                style={{ paddingBottom: "12px" }}
+      <div className="flex-1 flex justify-center">
+        <div
+          className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[3fr_1fr]"
+          style={{ gap: "48px", padding: "40px" }}
+        >
+          {/* LEFT */}
+          <div className="flex flex-col gap-10">
+            <h1 className="text-4xl font-extrabold text-slate-800">{fullName}</h1>
+
+            {/* TABS */}
+            <div className="flex gap-6 text-sm">
+              {["home", "about", "activity"].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t as any)}
+                  className={`capitalize ${
+                    tab === t
+                      ? "border-b-2 border-orange-500 font-semibold text-slate-800"
+                      : "text-gray-500 hover:text-slate-800"
+                  }`}
+                  style={{ paddingBottom: "12px" }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            {/* HOME */}
+            {tab === "home" && (
+              <div className="max-w-3xl flex flex-col gap-10">
+                {homePosts.length === 0 ? (
+                  <p className="text-gray-500">No posts yet.</p>
+                ) : (
+                  homePosts.map((post) => {
+                    const image = getPostImage(post);
+
+                    return (
+                      <Link
+                        key={post.id}
+                        href={`/posts/${post.id}`}
+                        className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition"
+                      >
+                        {image && (
+                          <img
+                            src={image}
+                            className="w-full h-72 object-cover"
+                            alt="post"
+                          />
+                        )}
+
+                        <div
+                          className="flex flex-col gap-5"
+                          style={{ padding: "24px" }}
+                        >
+                          <div className="flex gap-2 flex-wrap">
+                            <span
+                              className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
+                              style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
+                            >
+                              {post.section}
+                            </span>
+                            <span
+                              className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
+                              style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
+                            >
+                              {post.cuisine}
+                            </span>
+                            <span
+                              className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
+                              style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
+                            >
+                              {post.occasion}
+                            </span>
+                          </div>
+
+                          <h2 className="text-2xl font-bold text-slate-800">
+                            {post.title || "Untitled"}
+                          </h2>
+
+                          <p className="text-sm text-slate-700" style={{ lineHeight: "1.6" }}>
+                            {post.subheading}
+                          </p>
+
+                          <div className="flex justify-between text-sm text-gray-500">
+                            <span>By {post.author?.username || post.author}</span>
+                            <span>
+                              {new Date(post.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })
+                )}
+              </div>
+            )}
+
+            {/* ABOUT */}
+            {tab === "about" && (
+              <div
+                className="max-w-3xl bg-white rounded-2xl shadow-sm"
+                style={{ padding: "24px" }}
               >
-                {t}
-              </button>
-            ))}
-          </div>
+                <p className="text-base text-slate-800">{profile.bio || "—"}</p>
+              </div>
+            )}
 
-          {/* HOME */}
-          {tab === "home" && (
-            <div className="max-w-3xl flex flex-col gap-10">
-              {homePosts.length === 0 ? (
-                <p className="text-gray-500">No posts yet.</p>
-              ) : (
-                homePosts.map((post) => {
-                  const image = getPostImage(post);
-
-                  return (
-                    <Link
-                      key={post.id}
-                      href={`/posts/${post.id}`}
-                      className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:scale-[1.01] transition"
+            {/* ACTIVITY */}
+            {tab === "activity" && (
+              <div className="max-w-3xl flex flex-col gap-4">
+                {activity.length === 0 ? (
+                  <p className="text-gray-500">No activity yet.</p>
+                ) : (
+                  activity.map((item) => (
+                    <div
+                      key={item.id}
+                      className="relative bg-white rounded-xl shadow-sm hover:shadow-md transition"
+                      style={{ padding: "16px" }}
                     >
-                      {image && (
-                        <img
-                          src={image}
-                          className="w-full h-72 object-cover"
-                          alt="post"
-                        />
+                      {item.type === "comment" && (
+                        <button
+                          onClick={() => deleteComment(item.id)}
+                          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-lg w-6 h-6 flex items-center justify-center"
+                        >
+                          ×
+                        </button>
                       )}
 
-                      <div
-                        className="flex flex-col gap-5"
-                        style={{ padding: "24px" }}
-                      >
-                        <div className="flex gap-2 flex-wrap">
-                          <span
-                            className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
-                            style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
-                          >
-                            {post.section}
-                          </span>
-                          <span
-                            className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
-                            style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
-                          >
-                            {post.cuisine}
-                          </span>
-                          <span
-                            className="rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300"
-                            style={{ paddingLeft: "12px", paddingRight: "12px", paddingTop: "4px", paddingBottom: "4px" }}
-                          >
-                            {post.occasion}
-                          </span>
+                      <Link href={item.link}>
+                        <div
+                          className="text-xs text-gray-400"
+                          style={{ marginBottom: "4px" }}
+                        >
+                          {item.type === "post" ? "Post" : " Comment"}
                         </div>
 
-                        <h2 className="text-2xl font-bold text-slate-800">
-                          {post.title || "Untitled"}
-                        </h2>
-
-                        <p className="text-sm text-gray-500">
-                          {post.city}, {post.state}
+                        <p
+                          className="font-medium text-slate-800"
+                          style={{ paddingRight: "24px" }}
+                        >
+                          {item.type === "post"
+                            ? item.title
+                            : `You commented: "${item.title}"`}
                         </p>
 
-                        <p className="text-sm text-slate-700" style={{ lineHeight: "1.6" }}>
-                          {post.subheading}
-                        </p>
-
-                        <div className="flex justify-between text-sm text-gray-500">
-                          <span>By {post.author?.username || post.author}</span>
-                          <span>
-                            {new Date(post.created_at).toLocaleDateString()}
-                          </span>
+                        <div
+                          className="text-xs text-gray-400"
+                          style={{ marginTop: "8px" }}
+                        >
+                          {new Date(item.created_at).toLocaleString()}
                         </div>
-                      </div>
-                    </Link>
-                  );
-                })
-              )}
-            </div>
-          )}
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
 
-          {/* ABOUT */}
-          {tab === "about" && (
+          {/* RIGHT */}
+          <aside className="w-full max-w-sm">
             <div
-              className="max-w-3xl bg-white rounded-2xl shadow-sm"
+              className="bg-white rounded-2xl shadow-sm flex flex-col gap-4 sticky top-10 overflow-hidden"
               style={{ padding: "24px" }}
             >
-              <p className="text-base text-slate-800">{profile.bio || "—"}</p>
+              <img
+                src={profileImage}
+                className="w-24 h-24 rounded-full object-cover border"
+                alt={profile.username}
+              />
+
+              <div className="flex flex-col gap-1 text-sm text-gray-500 text-left break-words">
+                <p className="truncate">
+                  <b>User Name:</b> {profile.username}
+                </p>
+                <p className="truncate">
+                  <b>Name:</b> {fullName}
+                </p>
+                <p className="truncate">
+                  <b>Email:</b> {profile.email}
+                </p>
+              </div>
+
+              <Link
+                href="/account/settings/profile/edit-profile"
+                className="bg-orange-500 text-white font-bold text-base text-center rounded-full hover:bg-orange-600 transition inline-block w-full"
+                style={{ paddingTop: "14px", paddingBottom: "14px" }}
+              >
+                Edit Profile
+              </Link>
             </div>
-          )}
-
-          {/* ACTIVITY */}
-          {tab === "activity" && (
-            <div className="max-w-3xl flex flex-col gap-4">
-              {activity.length === 0 ? (
-                <p className="text-gray-500">No activity yet.</p>
-              ) : (
-                activity.map((item) => (
-                  <div
-                    key={item.id}
-                    className="relative bg-white rounded-xl shadow-sm hover:shadow-md transition"
-                    style={{ padding: "16px" }}
-                  >
-                    {item.type === "comment" && (
-                      <button
-                        onClick={() => deleteComment(item.id)}
-                        className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-lg w-6 h-6 flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    )}
-
-                    <Link href={item.link}>
-                      <div
-                        className="text-xs text-gray-400"
-                        style={{ marginBottom: "4px" }}
-                      >
-                        {item.type === "post" ? "Post" : " Comment"}
-                      </div>
-
-                      <p
-                        className="font-medium text-slate-800"
-                        style={{ paddingRight: "24px" }}
-                      >
-                        {item.type === "post"
-                          ? item.title
-                          : `You commented: "${item.title}"`}
-                      </p>
-
-                      <div
-                        className="text-xs text-gray-400"
-                        style={{ marginTop: "8px" }}
-                      >
-                        {new Date(item.created_at).toLocaleString()}
-                      </div>
-                    </Link>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
+          </aside>
         </div>
-
-        {/* RIGHT */}
-        <aside className="w-full max-w-sm">
-          <div
-            className="bg-white rounded-2xl shadow-sm flex flex-col gap-4 sticky top-10 overflow-hidden"
-            style={{ padding: "24px" }}
-          >
-            <img
-              src={profileImage}
-              className="w-24 h-24 rounded-full object-cover border"
-              alt={profile.username}
-            />
-
-            <div className="flex flex-col gap-1 text-sm text-gray-500 text-left break-words">
-              <p className="truncate">
-                <b>User Name:</b> {profile.username}
-              </p>
-              <p className="truncate">
-                <b>Name:</b> {fullName}
-              </p>
-              <p className="truncate">
-                <b>Email:</b> {profile.email}
-              </p>
-            </div>
-
-            <Link
-              href="/account/settings/profile/edit-profile"
-              className="bg-orange-500 text-white font-bold text-base text-center rounded-full hover:bg-orange-600 transition inline-block w-full"
-              style={{ paddingTop: "14px", paddingBottom: "14px" }}
-            >
-              Edit Profile
-            </Link>
-          </div>
-        </aside>
       </div>
     </div>
+  );
+}
+
+// Shared settings sidebar — matches AccountPage.tsx exactly so every
+// settings page shares the same navigation.
+function SettingsSidebar({ pathname }: { pathname: string | null }) {
+  return (
+    <aside
+      className="flex flex-col w-64 h-screen overflow-y-auto bg-white border-r border-gray-200"
+      style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "32px", paddingBottom: "32px" }}
+    >
+      <nav className="flex flex-col gap-1" style={{ marginTop: "24px" }}>
+        {SIDEBAR_ITEMS.map((item) => {
+          const active = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-2 text-sm font-medium rounded-lg hover:bg-gray-100 ${active ? "bg-gray-100 text-orange-500" : "text-gray-700"}`}
+              style={{ paddingLeft: "16px", paddingRight: "16px", paddingTop: "8px", paddingBottom: "8px" }}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
   );
 }
